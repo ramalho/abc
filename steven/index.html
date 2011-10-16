@@ -1,0 +1,138 @@
+<!--?xml version="1.0"?-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<link href="abc.css" rel="stylesheet" type="text/css">
+<title>A Short Introduction to the ABC Language</title>
+</head>
+<body>
+<h1>A Short Introduction to the ABC Language</h1>
+
+<p>(<a href="http://www2.airnet.ne.jp/sardine/complang/ABCintro.html">Also
+available in Japanese</a>)</p>
+
+<p class="callout"><span class="new">NEW</span> <a href="http://www.idhub.com/abc/">The ABC Programmer's
+	Handbook</a>  now available from Bosko Books.</p>
+
+<p>ABC is an interactive programming language and environment for
+personal computing, originally intended as a good replacement for
+BASIC. It was designed by first doing a <em>task analysis</em> of
+the programming task.</p>
+
+<p>ABC is easy to learn (an hour or so for someone who has already
+programmed), and yet easy to use. Originally intended as a language
+for beginners, it has evolved into a powerful tool for beginners
+and experts alike.</p>
+
+<p>Here is an example function <em>words</em> to collect the set of
+all words in a document:</p>
+
+<pre>   HOW TO RETURN words document:
+      PUT {} IN collection
+      FOR line IN document:
+         FOR word IN split line:
+            IF word not.in collection:
+               INSERT word IN collection
+      RETURN collection
+</pre>
+
+<p>Some features of the language:</p>
+
+<ul>
+<li>
+a powerful collection of only 5 data types that can easily be combined
+</li>
+
+<li>
+strong typing, yet without declarations
+</li>
+
+<li>
+no limitations (such as max int), apart from sheer exhaustion of memory
+</li>
+
+<li>
+refinements to support top-down programming
+</li>
+
+<li>
+nesting by indentation
+</li>
+
+<li>
+programs typically one fourth or one fifth the size of the equivalent Pascal or C.
+</li>
+</ul>
+
+<p>Some features of the environment:</p>
+
+<ul>
+<li>
+no need for files: procedures and functions and global variables remain after logging out
+</li>
+
+<li>
+one consistent face is shown to the user at all times, whether
+executing commands, editing, or entering input to a program
+</li>
+
+<li>
+generalized undo mechanism.
+</li>
+</ul>
+
+<p>Here follows a quick overview of the programming language ABC
+and its implementations, and a few examples of ABC programs. Full
+documentation about ABC is in the ABC Programmer's Handbook
+(details below).</p>
+
+<ul>
+<li><a href="http://homepages.cwi.nl/%7Esteven/abc/language.html">The Language</a></li>
+
+<li><a href="http://homepages.cwi.nl/%7Esteven/abc/environment.html">The Environment</a></li>
+
+<li><a href="http://homepages.cwi.nl/%7Esteven/abc/types.html">Some Simple Examples</a></li>
+
+<li><a href="http://homepages.cwi.nl/%7Esteven/abc/examples/">Program Examples</a></li>
+
+<li><a href="http://homepages.cwi.nl/%7Esteven/abc/teaching.html">Why ABC is good for teaching
+purposes</a></li>
+
+<li><a href="http://homepages.cwi.nl/%7Esteven/abc/implementations.html">Implementations</a>: for the PC, Unix, the
+	Mac, and even the Atari ST
+</li>
+
+<li><a href="http://homepages.cwi.nl/%7Esteven/abc/newsletter/">Newsletters</a></li>
+
+<li><a href="http://homepages.cwi.nl/%7Esteven/abc/publications.html">A list of all publications about ABC.</a></li>
+<li><a href="http://homepages.cwi.nl/%7Esteven/abc/qr.html">ABC Quick Reference.</a></li>
+</ul>
+
+<h2>MORE INFORMATION</h2>
+
+<p>Full details of ABC and the implementations, along with many
+example programs are in the book <a href="http://www.idhub.com/abc/"><cite>"The ABC Programmer's
+Handbook"</cite></a> by Leo Geurts, Lambert Meertens and Steven
+Pemberton, originally published by Prentice-Hall (ISBN 0-13-000027-2),
+      and now reissued by Bosko Books (ISBN 0-9547239-4-5).</p>
+
+<p>See also Steven Pemberton, <cite>"An Alternative Simple Language
+and Environment for PCs"</cite>, IEEE Software, Vol. 4, No. 1,
+January 1987, pp. 56-64.</p>
+
+<p>There are also copies of an irregular newsletter (see above).
+Back issues not online are no longer available.</p>
+
+<p>Email: <a href="mailto:abc@cwi.nl">abc@cwi.nl</a><br>
+</p>
+    <hr>
+    <address><a href="http://www.cwi.nl/%7Esteven/">Steven
+	Pemberton</a>, <a href="http://www.cwi.nl/">CWI</a>, <a href="http://www.cwi.nl/%7Esteven/amsterdam.html">Amsterdam</a></address>
+<!-- Created: Thu Jan 11 10:38:12 CET 2001 -->
+<!-- hhmts start -->
+Last modified: Mon Jan  9 10:57:42 CET 2006
+<!-- hhmts end -->
+
+
+
+</body></html>

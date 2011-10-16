@@ -1,0 +1,87 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<link href="abc.css" rel="stylesheet" type="text/css">
+<title>ABC Example: A Telephone List</title>
+<!-- Changed by: Steven Pemberton,  1-Nov-1996 -->
+</head>
+<body bgcolor="#ffff60">
+
+<h1>ABC Example: A Telephone List</h1>
+
+This uses the table data-type. In use, tables resemble arrays:
+<pre>	&gt;&gt;&gt; PUT {} IN tel
+	&gt;&gt;&gt; PUT 4054 IN tel["Jennifer"]
+	&gt;&gt;&gt; PUT 4098 IN tel["Timo"]
+	&gt;&gt;&gt; PUT 4134 IN tel["Guido"]
+
+	&gt;&gt;&gt; WRITE tel["Jennifer"]
+	4054
+
+</pre>
+You can write all ABC values out. Tables are kept sorted on the keys:
+<pre>	&gt;&gt;&gt; WRITE tel
+	{["Guido"]: 4134; ["Jennifer"]: 4054; ["Timo"]: 4098}
+</pre>
+The <em>keys</em> function returns a list:
+<pre>	&gt;&gt;&gt; WRITE keys tel
+	{"Guido"; "Jennifer"; "Timo"}
+
+	&gt;&gt;&gt; FOR name IN keys tel:
+	       WRITE name, ":", tel[name] /
+	Guido: 4134
+	Jennifer: 4054
+	Timo: 4098
+</pre>
+You can define your own commands:
+<pre>	HOW TO DISPLAY t:
+	   FOR name IN keys t:
+	      WRITE name&lt;&lt;10, t[name] /
+
+	&gt;&gt;&gt; DISPLAY tel
+	Guido      4134
+	Jennifer   4054
+	Timo       4098
+</pre>
+To find the user of a given number, you can use a quantifier:
+<pre>	&gt;&gt;&gt; IF SOME name IN keys tel HAS tel[name] = 4054:
+	       WRITE name
+	Jennifer
+</pre>
+Or create the inverse table:
+<pre>	&gt;&gt;&gt; PUT {} IN subscriber
+	&gt;&gt;&gt; FOR name IN keys tel:
+	       PUT name IN subscriber[tel[name]]
+
+	&gt;&gt;&gt; WRITE subscriber[4054]
+	Jennifer
+
+	&gt;&gt;&gt; WRITE subscriber
+	{[4054]: "Jennifer"; [4098]: "Timo"; [4134]: "Guido"}
+
+</pre>
+Commands and functions are polymorphic:
+<pre>	&gt;&gt;&gt; DISPLAY subscriber
+	4054       Jennifer
+	4098       Timo
+	4134       Guido
+</pre>
+Functions may return any type. Note that indentation is significant -
+there are no BEGIN-END's or { }'s:
+<pre>	HOW TO RETURN inverse t:
+	   PUT {} IN inv
+	   FOR k IN keys t:
+	      PUT k IN inv[t[k]]
+	   RETURN inv
+
+	&gt;&gt;&gt; WRITE inverse tel
+	{[4054]: "Jennifer"; [4098]: "Timo"; [4134]: "Guido"}
+
+	&gt;&gt;&gt; DISPLAY inverse inverse tel
+	Guido      4134
+	Jennifer   4054
+	Timo       4098
+
+</pre>
+
+
+</body></html>

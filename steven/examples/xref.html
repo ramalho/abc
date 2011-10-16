@@ -1,0 +1,65 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<link href="abc.css" rel="stylesheet" type="text/css">
+<title>ABC Example: A Cross-reference Indexer</title>
+<!-- Changed by: Steven Pemberton,  1-Nov-1996 -->
+</head>
+<body bgcolor="#ffff60">
+
+<h1>ABC Example: A Cross-reference Indexer</h1>
+
+'Text files' are represented as tables of numbers to strings:
+<pre>	HOW TO DISPLAY t:
+	   FOR name IN keys t:
+	      WRITE name&lt;&lt;10, t[name] /
+
+	&gt;&gt;&gt; DISPLAY poem
+	1         I've never seen a purple cow
+	2         I hope I never see one
+	3         But I can tell you anyhow
+	4         I'd rather see than be one
+</pre>
+The following function takes such a document, and returns the
+cross-reference index of the document: a table from words to lists of
+line-numbers:
+<pre>	HOW TO RETURN index doc:
+	   PUT {} IN where
+	   FOR line.no IN keys doc:
+	      TREAT LINE
+	   RETURN where
+	TREAT LINE:
+	   FOR word IN split doc[line.no]:
+	      IF word not.in keys where:
+		 PUT {} IN where[word]
+	      INSERT line.no IN where[word]
+</pre>
+TREAT LINE here is a refinement, directly supporting
+stepwise-refinement. 'split' is a function that splits a string into
+its space-separated words:
+<pre>	&gt;&gt;&gt; WRITE split "Hello world"
+	{[1]: "Hello"; [2]: "world"}
+
+	&gt;&gt;&gt; DISPLAY index poem
+	But        {3}
+	I          {2; 2; 3}
+	I'd        {4}
+	I've       {1}
+	a          {1}
+	anyhow     {3}
+	be         {4}
+	can        {3}
+	cow        {1}
+	hope       {2}
+	never      {1; 2}
+	one        {2; 4}
+	purple     {1}
+	rather     {4}
+	see        {2; 4}
+	seen       {1}
+	tell       {3}
+	than       {4}
+	you        {3}
+</pre>
+
+
+</body></html>

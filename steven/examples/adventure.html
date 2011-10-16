@@ -1,0 +1,427 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<link href="abc.css" rel="stylesheet" type="text/css">
+<title>ABC Example: An Adventure Program</title>
+<!-- Changed by: Steven Pemberton,  1-Nov-1996 -->
+</head>
+<body bgcolor="#ffff60">
+<h1>ABC Example: An Adventure Program</h1>
+
+<address>
+Steven Pemberton<br>
+CWI, Amsterdam
+</address>
+<p>
+Adventure style games are very popular in computing circles, and I'm
+going to develop a small one here.  Because of space I will have to
+leave out many of the advanced features of most adventure games, but
+it will give you an idea of how it looks in ABC.  And of course it
+will be obvious how the bells and whistles can quickly be added on.
+</p><p>
+As I'm sure you know, a (textual) adventure program works by
+describing a scene.  You then give instructions on where to go, or
+what to do, and it responds by telling you what happened as a result.
+For instance, if it says
+</p><pre>	You are standing by a building at the end of a road.
+	A spring flows from the building.
+</pre>
+and you reply
+<pre>	&gt; enter building
+</pre>
+it might reply
+<pre>	You are inside a building, a well house for a spring.
+	There is a bottle here.
+	There are some keys here.
+</pre>
+after which the dialogue might proceed as follows:
+<pre>	&gt; take keys
+	&gt; leave the building
+	Please use 1 or 2 word sentences.
+	&gt; leave
+	You are outside the building.
+	&gt; go west
+	You are standing by a stream.
+	&gt; go south
+	You are at a small slit that the stream runs down.
+	A dry river bed carries on ahead.
+	&gt; go down
+	You don't seem to be able to go that way.
+	&gt; south
+	You have found a metal grate fixed into the ground.
+	&gt; down
+	Sorry, you can't do that.
+	&gt; open grate
+	The grate is open.
+	You are at a hole in the ground.
+	There is a metal grate lying on the ground.
+	&gt; down
+	You are in a dim chamber.
+	A hole in the ceiling shows the sky above.
+</pre>
+and so on.
+<p>
+The main program making up this adventure looks like this:
+</p><pre>	HOW TO ADVENTURE:
+	   START
+	   GET command
+	   WHILE command &lt;&gt; "quit":
+	      OBEY command
+	      GET command
+	   FINISH
+</pre>
+START will initialise some variables, like the place where the player
+is, and what the player is holding.  FINISH will print out the score
+and so on.  GET will print the prompt, read a line, strip off spaces,
+and reduce it to lower-case:
+<pre>	HOW TO GET command:
+	   GET LINE
+	   WHILE command = "": GET LINE
+	GET LINE:
+	   WRITE "&gt; "
+	   READ command RAW
+	   PUT lower stripped command IN command
+</pre>
+OBEY has to split a command into its constituent words, and then
+decide what action needs to be taken for that command:
+<pre>	HOW TO OBEY command:
+	   SPLIT command INTO verb AND object
+	   SELECT:
+	      verb = "": PASS
+	      special command: TRY TO MOVE command
+	      verb = "move": TRY TO MOVE object
+	      verb = "take": TRY TO TAKE object
+	      verb = "drop": TRY TO DROP object
+	      verb = "kill": TRY TO KILL object
+	      verb = "what": INVENTORY
+	      ELSE: CAN'T DO verb, object
+</pre>
+SPLIT does what its name suggests: splits the command into its
+constituent words, and makes sure it only consists of one or two
+words:
+<pre>	HOW TO SPLIT command INTO verb AND object:
+	   PUT split command IN words
+	   SELECT:
+	      #words = 1: PUT words item 1, "" IN verb, object
+	      #words = 2: PUT words item 1, words item 2 IN verb, object
+	      ELSE:
+		 WRITE "Please use 1 or 2 word sentences." /
+		 PUT "", "" IN verb, object
+</pre>
+A nice feature is to allow synonyms for commands, to allow ``go west''
+and ``proceed west'' and ``move west'' all to mean the same thing.  We
+can do that by having a table of synonyms:
+<pre>	&gt;&gt;&gt; WRITE synonyms["move"]
+	{"go"; "proceed"}
+</pre>
+and then adding in SPLIT:
+<pre>	SHARE synonyms
+	...
+	IF SOME word IN keys synonyms HAS verb in synonyms[word]:
+	   PUT word IN verb
+</pre>
+
+<h2>Moving places</h2>
+<p>
+In this adventure, each place has a name, which is a short description
+you get each time you visit it after the first time (``You are x'',
+such as ``outside the building'' above).  Then, each place has a long
+description used for describing it the first time you go there.  Such
+a description is stored as a table of lines, for instance
+</p><pre>	&gt;&gt;&gt; WRITE description["inside large hall"]
+	{[1]: "This is a large hall."; [2]: "There is an exit to the west."}
+</pre>
+To display such a message neatly, we can define the following command:
+<pre>	HOW TO DISPLAY message:
+	   FOR line IN message:
+	      WRITE line /
+
+	&gt;&gt;&gt; DISPLAY description["inside large hall"]
+	This is a large hall.
+	There is an exit to the west.
+</pre>
+Then there is a map of all locations, which gives for each location a
+table of directions that the player can go in, and where that
+direction leads to.
+<pre>	&gt;&gt;&gt; WRITE map["inside the building"]
+	{["out"]: "outside the building"}
+	&gt;&gt;&gt; WRITE map["outside the building"]
+	{["in"]: "inside the building"; ["south"]: "standing by the stream";
+	["west"]: "in the forest"}
+</pre>
+We can play a nasty trick on the player:
+<pre>	&gt;&gt;&gt; WRITE map["in the forest"]
+	{["east"]: "in the forest"; ["north"]: "in the forest";
+	["south"]: "in the forest"; ["west"]: "standing by the stream"}
+</pre>
+Moving is attempted by means of the command TRY TO MOVE.  All commands
+beginning TRY TO first check that the conditions for the action are
+acceptable, and only then do the action.  The current location is held
+in <em>place</em>: TRY TO MOVE checks that the direction asked for is in the
+map for the current place:
+<pre>	HOW TO TRY TO MOVE direction:
+	   SHARE map, place
+	   SELECT:
+	      direction = "":
+		 WRITE "Where to?" /
+	      direction in keys map[place]:
+		 MOVE TO map[place][direction]
+	      ELSE:
+		 WRITE "You don't seem to be able to go that way" /
+</pre>
+MOVE TO does the actual moving.  For now here is a simple version, but
+it will get more involved later.
+<pre>	HOW TO MOVE TO there:
+	   SHARE place
+	   PUT there IN place
+	   DESCRIBE place
+</pre>
+(DESCRIBE describes a place and the objects to be found there; you'll
+see it shortly.)
+<p>
+In OBEY, you will have noticed the lines
+</p><pre>	   SELECT:
+	      special command: TRY TO MOVE command
+</pre>
+This is to allow the player to say <em>south</em> instead of <em>go south</em>, by
+seeing if the command is already in the map for the current place:
+<pre>	HOW TO REPORT special command:
+	   SHARE map, place
+	   REPORT command in keys map[place]
+</pre>
+Notice that it also allows you to use commands instead of directions
+in the map.  For instance, when at the grate, you can open the grate
+by having two places, an open grate and a closed grate:
+<pre>	&gt;&gt;&gt; WRITE map["at closed grate"]
+	{["north"]: "at slit"; ["open grate"]: "at open grate"}
+</pre>
+
+<h2>Taking and dropping objects</h2>
+<p>
+Different objects are left lying about at various places.  These are
+recorded in a table <em>objects</em>.  Just as with places, each object has a
+simple name, to be used when the player wants to know what is being
+carried, and a longer description when an object is first found.
+</p><pre>	&gt;&gt;&gt; WRITE objects["inside the building"]
+	{"bottle"; "keys"}
+	&gt;&gt;&gt; WRITE description["keys"]
+	There are some keys here.
+</pre>
+Now I can show you DESCRIBE.  It remembers which places have already
+been described (and therefore visited), and only gives the long
+description the first time:
+<pre>	HOW TO DESCRIBE place:
+	   SHARE description, objects, visited
+	   SELECT:
+	      place in visited:
+		 WRITE "You are ", place /
+	      ELSE:
+		 DISPLAY description[place]
+		 INSERT place IN visited
+	   FOR object IN objects for place:
+	      DISPLAY description[object]
+</pre>
+Notice here the line ``FOR object IN objects for place:''.  Not every
+place may be recorded in the objects table, so it is a shorthand to
+save repeated checks to see if it is:
+<pre>	HOW TO RETURN property for thing:
+	   SELECT:
+	      thing in keys property: RETURN property[thing]
+	      ELSE: RETURN {}
+</pre>
+You'll find it used again later on.
+<p>
+Then there is a list of what the player is carrying, called <em>holding</em>,
+which is initially empty.  To find out what is being carried, the
+player can ask for an inventory:
+</p><pre>	HOW TO INVENTORY:
+	   SHARE holding
+	   SELECT:
+	      holding = {}:
+		 WRITE "You aren't carrying anything" /
+	      ELSE:
+		 WRITE "You are carrying: "
+		 LIST holding
+</pre>
+This uses a useful command to neatly print a list of objects:
+<pre>	HOW TO LIST things:
+	   PUT "" IN separator
+	   FOR object IN things:
+	      WRITE separator, object
+	      PUT ", " IN separator
+	   WRITE /
+
+	&gt;&gt;&gt; LIST objects["inside the building"]
+	bottle, keys
+</pre>
+Another useful tool is a test to see if an object is currently being
+carried:
+<pre>	HOW TO REPORT carrying object:
+	   SHARE holding
+	   REPORT object in holding
+</pre>
+and another to test if an object is present:
+<pre>	HOW TO REPORT present object:
+	   SHARE objects, place
+	   REPORT object in objects for place
+</pre>
+TRY TO TAKE can now check that the object is present, that it's not
+already being carried and so on, before actually taking it:
+<pre>	HOW TO TRY TO TAKE object:
+	   SHARE holding
+	   SELECT:
+	      object = "":
+		 WRITE "Which object?" /
+	      carrying object:
+		 WRITE "You're already carrying it!" /
+	      NOT present object:
+		 WRITE "I see no `object`." /
+	      #holding &gt; 6:
+		 WRITE "You can't carry any more." /
+	      ELSE:
+		 TAKE object
+</pre>
+TAKE looks like this, again a simple version for now:
+<pre>	HOW TO TAKE object:
+	   SHARE holding, objects, place
+	   REMOVE object FROM objects[place]
+	   INSERT object IN holding
+</pre>
+
+TRY TO DROP is similar:
+<pre>	HOW TO TRY TO DROP object:
+	   SELECT:
+	      object = "": WRITE "Which object?" /
+	      NOT carrying object: WRITE "You're not holding it!" /
+	      ELSE: DROP object
+
+	HOW TO DROP object:
+	   SHARE holding, objects, place
+	   REMOVE object FROM holding
+	   INCLUDE object IN objects FOR place
+</pre>
+The command INCLUDE adds an item to a table:
+<pre>	HOW TO INCLUDE object IN property FOR thing:
+	   IF thing not.in keys property:
+	      PUT {} IN property[thing]
+	   INSERT object IN property[thing]
+</pre>
+
+<h2>Conditions and side effects</h2>
+<p>
+One of the tricks of adventure games is that certain actions are not
+possible unless you are at a certain place, or you are carrying a
+certain thing, and some actions have unexpected side-effects.
+</p><p>
+For instance, you shouldn't be able to open the grate if you aren't
+carrying the keys.  So we can alter MOVE TO to check for this:
+</p><pre>	HOW TO MOVE TO there:
+	   SHARE place
+	   SELECT:
+	      opening.grate AND NOT carrying "keys":
+		 WRITE "I don't seem able to open the grate" /
+	      ELSE:
+		 PUT there IN place
+		 DESCRIBE place
+	opening.grate:
+	   REPORT (place, there) = ("at closed grate", "at open grate")
+</pre>
+Similarly, somewhere in the cave there is a bird, but you can only
+catch it if you're carrying the cage.  Furthermore, the jangling of
+the keys frightens it.  So we can alter TAKE to do this:
+<pre>	HOW TO TAKE object:
+	   SHARE holding, objects, place
+	   SELECT:
+	      object = "bird" AND carrying "keys":
+		 WRITE "The bird flutters off in fright." /
+	      object = "bird" AND NOT carrying "cage":
+		 WRITE "You don't seem able to catch the bird." /
+	      ELSE:
+		 REMOVE object FROM objects[place]
+		 INSERT object IN holding
+</pre>
+An example of a side-effect is that dropping the bird is the only way
+to scare off the snake (should you meet it):
+<pre>	HOW TO DROP object:
+	   SHARE holding, objects, place
+	   IF object = "bird" AND present "snake":
+	      WRITE "With a great flurry the bird attacks the snake." /
+	      WRITE "The snake flees into the darkness." /
+	      REMOVE "snake" FROM objects[place]
+	   REMOVE object FROM holding
+	   INCLUDE object IN objects FOR place
+</pre>
+(Obviously, TAKE should also be changed to prevent you from trying to
+take the snake.)
+
+<h2>Removing objects with extreme prejudice</h2>
+
+Now you've seen that there are living creatures in the cave.  Certain
+of them are undesirable to the player's well-being and score, and in
+the brutal tradition of adventure games must be eliminated.  Of course
+some are harmless, but computers only do what they are told...
+<pre>	HOW TO TRY TO KILL object:
+	   SELECT:
+	      object = "":
+		 WRITE "Which object?" /
+	      (NOT present object) AND (NOT carrying object):
+		 WRITE "I see no `object`" /
+	      ELSE:
+		 KILL object
+
+	HOW TO KILL object:
+	   SHARE holding, objects, place
+	   SELECT:
+	      object = "bird":
+		 WRITE "How cruel! The poor bird dies with a mournful peep." /
+		 ELIMINATE
+		 INCLUDE "dead bird" IN objects FOR place
+	      object = "snake":
+		 WRITE "Attacking the snake is both dangerous and ineffective." /
+	      ELSE:  It's not a living creature
+		 WRITE "It's already dead!" /
+	ELIMINATE:
+	   SELECT:
+	      carrying object: REMOVE object FROM holding
+	      present object: REMOVE object FROM objects[place]
+</pre>
+
+<h2>Odds and ends</h2>
+<p>
+Well, that's the body of the adventure.  Of course, lots of extra
+places, objects, beings and commands must be added, but that's just a
+case of more of the same.
+</p><p>
+In OBEY, if it can't obey your command, it invokes CAN'T DO.  As a
+nicety this prints funny remarks for certain commands.  For instance,
+if you're at the stream, you might try ``swim'':
+</p><pre>	&gt;&gt;&gt; DISPLAY funny["swim"]
+	The water would get into my circuits.
+
+	HOW TO CAN'T DO verb:
+	   SHARE funny
+	   SELECT:
+	      verb in keys funny: DISPLAY funny[verb]
+	      ELSE:
+		 WRITE "Sorry, you can't do that" /
+</pre>
+As a final touch, you might want to add the commands ``save'' and
+``restore'' to OBEY, so you can save a game, and come back later to it
+(or so you can try something, and if it fails restore it and try
+something else).
+<p>
+This is remarkably easy.  Since the state of the game is reflected by
+a small number of variables, you can just put them in another
+variable:
+</p><pre>	HOW TO SAVE:
+	   SHARE saved, holding, objects, place
+	   PUT holding, objects, place IN saved
+
+	HOW TO RESTORE:
+	   SHARE saved, holding, objects, place
+	   PUT saved IN holding, objects, place
+	   DESCRIBE place
+</pre>
+Copyright © Steven Pemberton, CWI, Amsterdam, 1991
+
+
+</body></html>

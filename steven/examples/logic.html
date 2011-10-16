@@ -1,0 +1,504 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<link href="abc.css" rel="stylesheet" type="text/css">
+<title>Backtracking in ABC: the Budd Challenge</title>
+<!-- Changed by: Steven Pemberton,  1-Nov-1996 -->
+</head><body bgcolor="#ffff60">
+<h1><a name="HDT0">Backtracking in ABC: The Budd Challenge</a></h1>
+<p></p><address>Steven Pemberton, CWI, Amsterdam</address>
+<h2>Table of Contents</h2>
+<ul>
+<a href="#HDR">Introduction </a><br>
+<a href="#HDR0">A Solution</a><br>
+<a href="#HDR1">Producing the result forwards </a><br>
+<a href="#HDR2">Another possible representation </a><br>
+<a href="#HDR3">Multiple paths</a><br>
+<a href="#HDR4">Solving other problems </a><br>
+<a href="#HDR5">Exercise </a><br>
+<a href="#HDR6">Conclusion </a><br>
+<a href="#HDR7">References</a><br>
+</ul>
+
+<hr>
+<!-- This file was created with the fm2html filter.
+The filter is copyright Norwegian Telecom Research and
+was programmed by Jon Stephenson von Tetzchner. -->
+<h2><a name="HDR">Introduction</a></h2>
+<p>In his article ``(Extremely) Simple Logic Programming in
+      <i>B</i>'' [1], Tim Budd presented a program in <i>B</i> (the
+      forerunner of ABC) for solving the ``Farmer, Wolf, Goat and 
+Cabbage in a boat trying to get to the other side of the river without 
+eating each other'' problem. The problem involves the four named trying 
+to cross a river with a boat that can only take two of them at a time, 
+with the added complication that only the farmer can row, and that the 
+goat will eat the cabbage, and the wolf will eat the goat, if they are 
+left without the farmer's supervision. 
+</p><p>Tim's program uses backtracking, and in the way it is formulated takes advantage of the fact that functions in <i>B</i>
+ have no side-effects, in effect doing the backtracking automatically 
+for you. However, the program does have the `side effect' of writing the
+ results out as it goes along, rather than returning the result. When 
+pointing this out, Tim says: 
+</p><ul><p><i>This is a two-edged sword, however, since in some cases 
+one would like to modify the global environment and that then becomes 
+more difficult. 
+</i></p></ul><p>In other words, if the effect you want to have is more than just writing your answer out, bad luck. 
+</p><p>The purpose of this article is to show that it is not at all 
+difficult to write such a program, both using ABC's automatic 
+backtracking <i>and</i> returning a result. 
+</p><p>Just for interest's sake, I shall also modify some other aspects 
+of Tim's program, to compare how different approaches to data-structures
+ affect the program, but this in no way affects the main point of the 
+article, which is to demonstrate returning results in a backtracking 
+program. 
+</p><h2><a name="HDR0">A Solution</a></h2>
+<p>First of all, I'm going to alter how the positions of the 
+participants are represented: Tim used a compound like (1, 1, 1, 1) to 
+represent all four participants being on the north bank: each field was 
+the position of one participant in the order: farmer, wolf, goat, 
+cabbage; a zero represented the south bank. 
+</p><p>Rather than represent north and south by 1 and 0, I shall use the
+ texts "N" and "S" (I would have used "north" and "south", but this 
+makes some of the lines below wider than will fit on the page). Tim said
+ that he chose the integers to make the conversion from one to the other
+ easier. For the text representation, we have to alter the definition of
+ the function <em>opposite</em>: 
+</p><ul><pre>HOW TO RETURN opposite position:
+   RETURN {["N"]: "S"; ["S"]: "N"}[position]
+</pre></ul>
+<p>Just to test it: 
+</p><ul><pre>&gt;&gt;&gt; WRITE opposite "N"
+<i>S
+</i>&gt;&gt;&gt; WRITE opposite "S"
+<i>N</i>
+</pre></ul>
+<p>(Alternatively, a global target could contain the above table, and be SHAREd wherever needed.) 
+</p><p>Now a more explicit data-structure can be used to represent the positions, such as a table: 
+</p><ul><pre>{["cabbage"]: "N"; ["farmer"]: "N"; ["goat"]: "N"; ["wolf"]: "N"}.
+</pre></ul>
+<p>Next we need an easy method of altering the set of positions when a 
+boat-load goes to the opposite bank. If we represent a boat-load by a 
+list of who is in the boat, for instance {"farmer"; "goat"} then we can 
+use the following function to take a position and a list of travellers 
+and return the new position: 
+</p><ul><pre>HOW TO RETURN position altered.for occupants:
+   FOR occupant IN occupants:
+      PUT opposite position[occupant] IN position[occupant]
+   RETURN position
+&gt;&gt;&gt; PUT {} IN start
+&gt;&gt;&gt; FOR participant IN {"farmer"; "goat"; "wolf"; "cabbage"}:
+       PUT "N" IN start[participant]
+&gt;&gt;&gt; WRITE start altered.for {"farmer"; "goat"}
+<i>{["cabbage"]: "N"; ["farmer"]: "S"; ["goat"]: "S"; ["wolf"]: "N"}</i>
+</pre></ul>
+<p>We also need a way to see if a given position is `safe', that is to 
+say that the goat is not left alone with the cabbage, and that the wolf 
+is not left alone with the goat: 
+</p><ul><pre>HOW TO REPORT safe pos:
+   REPORT farmer.with.goat OR goat.out.of.mischief
+farmer.with.goat:
+   REPORT pos["farmer"] = pos["goat"]
+goat.out.of.mischief:
+   REPORT pos["cabbage"] &lt;&gt; pos["goat"] &lt;&gt; pos["wolf"]
+</pre></ul>
+<p>(Notice the shorthand c&lt;&gt;g&lt;&gt;w instead of c&lt;&gt;g AND 
+g&lt;&gt;w. Another way of writing the same is g not.in {c; w}.) 
+</p><p>Now, the new version of the program to solve the river problem, 
+instead of printing out its results as it goes along, will return the 
+answer as a value. This result is a sequence of boat-loads necessary to 
+solve the problem. 
+</p><p>Sequences are typically represented in ABC as tables with the 
+elements of the sequence as items, and integers as keys. Elements are 
+then added to the sequence with a command such as
+</p><ul><pre>PUT element IN sequence[#sequence]
+</pre></ul>
+<p>so that the first element is stored at key [0], the second at [1], and so on. 
+</p><p>In this program, the result is a sequence of boat-loads and so it
+ will be represented as a table with integers as indexes, and boat-loads
+ as elements. The only difference is that the boat-loads are produced by
+ the program in reverse order to how they will be printed out, and so 
+the elements will be added at the <i>head</i> of the sequence. This can be done with the command PUT element IN path[-#path], which we can make into a function: 
+</p><ul><pre>HOW TO RETURN path with element:
+   PUT element IN path[-#path]
+   RETURN path
+</pre></ul>
+<p>An example of a sequence of boat-loads is 
+</p><ul><pre>{[-2]: {"farmer"; "goat"}; [-1]: {"farmer"}; [0]: {"wolf"; "farmer"}}
+</pre></ul>
+<p>representing the farmer taking the goat across the river, returning alone, and then taking the wolf. 
+</p><p>The program either succeeds, and produces such a path, or the 
+(sub-)problem has no solution, and so it should fail. To represent these
+ two cases, the program returns a compound, consisting of a text, either
+ "success" or "failure" indicating whether it has succeeded or not, and 
+then the path, empty for failure, and the solution for success. (At 
+first I had the program only return a path, and used an `impossible' 
+path, such as {[1]: {}} to represent failure. I quickly saw this as a 
+typical programmer's kludge, and replaced it with the cleaner solution 
+here.). To make life easier, let's have a command to print out the 
+result (this is just a simple version, it could be made prettier): 
+</p><ul><pre>HOW TO PRINT result.and.path:
+   PUT result.and.path IN result, path
+   SELECT:
+      result = "failure":
+         WRITE "No solution" /
+      ELSE:
+         FOR move IN path:
+            WRITE "Move", move /
+</pre></ul>
+<p>The original program took as parameter the target position of the four, and then searched <i>backwards</i>
+ to see if there was a way that that position could be reached from the 
+start position (which was `hard-wired' in the program). It was necessary
+ to search backwards, because, like the new version, it produced its 
+answers backwards, and so the two backwardses cancelled each other out. 
+Another change I have made to the original program is to make both the 
+start and the target positions parameters, and to make the program 
+search from the start position for a path to the target position. As I 
+have already said, it produces its answers backwards, but stores them in
+ the result backwards, so that they still come out the right way round. 
+</p><p>The final change is that now `allowable' boat-loads are not 
+hard-wired in the program, but represented as a list: a maximum of two 
+can fit in the boat (it's a very large cabbage), and furthermore only 
+the farmer can row: 
+</p><ul><pre>&gt;&gt;&gt; PUT {} IN allowable
+&gt;&gt;&gt; INSERT {"farmer"} IN allowable
+&gt;&gt;&gt; FOR other IN {"cabbage"; "goat"; "wolf"}:
+       INSERT {"farmer"; other} IN allowable
+</pre></ul>
+<p>We can now write a function that returns which boat-loads are possible from the current position: 
+</p><ul><pre>HOW TO RETURN possible.from position:
+   SHARE allowable
+   PUT {} IN result
+   FOR boat.load IN allowable:
+      IF EACH occupant IN boat.load HAS on.same.side:
+         INSERT boat.load IN result
+   RETURN result
+on.same.side:
+   REPORT position[occupant] = position[min boat.load]
+</pre></ul>
+<p>So now, after that introduction to the data-types, we can see the 
+program proper. You'll notice comparing it with Tim's original, that the
+ main body is more or less the same, except that results are being 
+returned rather than tests being reported. The main difference is in the
+ refinement to try the next move. Tim's program tried each of four 
+refinements until one succeeded. The new version tries each of the 
+allowable boat-loads until one succeeds. If none succeeds, it fails. A 
+marginal issue is how to treat the case where the aim is reachable, but 
+not safe in itself. Tim's version accepted it, and printed the result; 
+this version by reversing the order of the first two IF commands, does 
+not accept it. 
+</p><ul><pre>HOW TO RETURN position path.to aim:
+   SHARE looking
+   IF position in looking OR NOT safe position: RETURN failure
+   IF position = aim: RETURN success
+   INSERT position IN looking
+   RETURN next.move
+next.move:
+   FOR boat.load IN possible.from position:
+      PUT new.position path.to aim IN result, path'
+      IF result &lt;&gt; "failure": RETURN result, path' with boat.load
+   RETURN failure
+new.position: RETURN position altered.for boat.load
+success: RETURN "success", {}
+failure: RETURN "failure", {}
+</pre></ul>
+<p>(Remember that <em>looking</em> is used to prevent the program 
+searching for a solution to a position it is already trying to solve -- 
+otherwise you can get an infinite loop.) Now to try it out: 
+</p><ul><pre>&gt;&gt;&gt; PUT {}, {} IN start, aim
+&gt;&gt;&gt; FOR occupant IN {"farmer"; "goat"; "wolf"; "cabbage"}:
+       PUT "N", "S" IN start[occupant], aim[occupant]
+&gt;&gt;&gt; PUT {} IN looking
+&gt;&gt;&gt; PRINT start path.to aim
+<i>Move {"farmer"; "goat"}
+Move {"farmer"}
+Move {"cabbage"; "farmer"}
+Move {"farmer"; "goat"}
+Move {"farmer"; "wolf"}
+Move {"farmer"}
+Move {"farmer"; "goat"}</i>
+</pre></ul>
+<p>Now to try it with a different aim: the farmer has to get the cabbage
+ to the other side (to sell it to the hungry computer programmer who 
+lives there): 
+</p><ul><pre>&gt;&gt;&gt; PUT start IN aim
+&gt;&gt;&gt; PUT "S" IN aim["cabbage"]
+&gt;&gt;&gt; PRINT start path.to aim
+<i>Move {"farmer"; "goat"}
+Move {"farmer"}
+Move {"cabbage"; "farmer"}
+Move {"farmer"; "goat"}</i>
+</pre></ul>
+<p>Now, finally, the farmer is fed up with goats, cabbages and wolves, and wants to be alone on the other side: 
+</p><ul><pre>&gt;&gt;&gt; PUT start IN aim
+&gt;&gt;&gt; PUT "S" IN aim["farmer"]
+&gt;&gt;&gt; PRINT start path.to aim
+<i>No solution</i>
+</pre></ul>
+<p>Alas, poor farmer. 
+</p><h2><a name="HDR1">Producing the result forwards </a></h2>
+<p>The question arises as to <i>why</i> the program produces the result 
+backwards. The answer for Tim's version of the program is that you don't
+ know until you've reached the goal whether the current position is on a
+ successful path, and so you can't write anything until then. With the 
+new version you do have the option of producing the results forwards. To
+ do it you have to pass to <em>path.to</em> not only the current position, but how you got to it (as a path). Just to show you how it would look, here is <em>path.to</em> altered in that way. The function <em>with</em> would also have to be altered to append elements to the path, rather than prepend them. 
+</p><ul><pre>HOW TO RETURN (route, position) path.to aim:
+   SHARE looking
+   IF position in looking OR NOT safe position: RETURN failure
+   IF position = aim: RETURN success
+   INSERT position IN looking
+   RETURN next.move
+next.move:
+   FOR boat.load IN possible.from position:
+      PUT (new.route, new.position) path.to aim IN result, path'
+      IF result &lt;&gt; "failure": RETURN result, path'
+   RETURN failure
+new.route: RETURN route with boat.load
+new.position: RETURN position altered.for boat.load
+success: RETURN "success", route
+failure: RETURN "failure", {}
+</pre></ul>
+<p>You would then have to call it as 
+</p><ul><pre>PRINT ({}, start) path.to aim
+</pre></ul>
+<p>However, you may notice that <em>route</em> here contains more or less the complementary information to what <em>looking</em> contains. If you represent a path as the sequence of positions, instead of the sequence of moves, you can do away with <em>looking</em> altogether, with the choice of SHAREing <em>route</em> or passing it as a parameter: 
+</p><ul><pre>HOW TO RETURN (route, position) path.to aim:
+   IF position in route OR NOT safe position: RETURN failure
+   PUT route with position IN route
+   IF position = aim: RETURN success
+   RETURN next.move
+next.move:
+   FOR boat.load IN possible.from position:
+      PUT (route, new.position) path.to aim IN result, path'
+      IF result &lt;&gt; "failure": RETURN result, path'
+   RETURN failure
+new.position: RETURN position altered.for boat.load
+success: RETURN "success", route
+failure: RETURN "failure", {}
+</pre></ul>
+<p>This means that you get as output the states rather than the moves you have to make: 
+</p><ul><pre>&gt;&gt;&gt; PRINT ({}, start) path.to aim
+<i>{["cabbage"]: "N"; ["farmer"]: "N"; ["goat"]: "N"; ["wolf"]: "N"}
+{["cabbage"]: "N"; ["farmer"]: "S"; ["goat"]: "S"; ["wolf"]: "N"}
+{["cabbage"]: "N"; ["farmer"]: "N"; ["goat"]: "S"; ["wolf"]: "N"}
+{["cabbage"]: "S"; ["farmer"]: "S"; ["goat"]: "S"; ["wolf"]: "N"}
+{["cabbage"]: "S"; ["farmer"]: "N"; ["goat"]: "N"; ["wolf"]: "N"}
+{["cabbage"]: "S"; ["farmer"]: "S"; ["goat"]: "N"; ["wolf"]: "S"}
+{["cabbage"]: "S"; ["farmer"]: "N"; ["goat"]: "N"; ["wolf"]: "S"}
+{["cabbage"]: "S"; ["farmer"]: "S"; ["goat"]: "S"; ["wolf"]: "S"}</i>
+</pre></ul>
+<p>However, for the rest of this article I will stick with the reverse method. 
+</p><h2><a name="HDR2">Another possible representation </a></h2>
+<p>You may remark in <em>path.to</em> that there is no dependency within
+ the how-to on exactly how a position is represented. What would we have
+ to change if we represented it as, for instance, {["N"]: {"farmer"; 
+"goat"}; ["S"]: {"cabbage"; "wolf"}}, a representation that more closely
+ represents the real state of affairs? 
+</p><p>Well, the main change would come in <em>altered.for</em>, which would look like this: 
+</p><ul><pre>HOW TO RETURN positions altered.for occupants:
+   FOR occupant IN occupants:
+      SELECT:
+         SOME place IN keys positions HAS occupant in positions[place]:
+            REMOVE occupant FROM positions[place]
+            INSERT occupant IN positions[opposite place]
+   RETURN positions
+&gt;&gt;&gt; PUT {["S"]: {}} IN banks
+&gt;&gt;&gt; PUT {"farmer"; "goat"; "cabbage"; "wolf"} IN banks["N"]
+&gt;&gt;&gt; WRITE banks altered.for {"goat"; "cabbage"}
+<i>{["N"]: {"farmer"; "wolf"}; ["S"]: {"cabbage"; "goat"}}</i>
+</pre></ul>
+<p>A corresponding change also has to be made to possible.from. 
+<br>The only other thing that must be changed is the test safe, but it 
+can be expressed even more simply now, since we can use a list of 
+illegal positions: 
+</p><ul><pre>&gt;&gt;&gt; PUT {} IN illegal
+&gt;&gt;&gt; INSERT {"goat"; "cabbage"} IN illegal
+&gt;&gt;&gt; INSERT {"goat"; "wolf"} IN illegal
+&gt;&gt;&gt; INSERT {"goat"; "cabbage"; "wolf"} IN illegal
+</pre></ul>
+<p>and then use this test: 
+</p><ul><pre>HOW TO REPORT safe position:
+   SHARE illegal
+   REPORT NO place IN position HAS place in illegal
+</pre></ul>
+<h2><a name="HDR3">Multiple paths</a></h2>
+<p>An interesting change to consider is returning not just one solution, but <i>all</i> solutions to the problem. Clearly then, <em>path.to</em> must return not just one path, but all paths solving the problem, so we'll call it <em>paths.to</em>.
+ In this case we don't need to return the `success' or `failure' 
+indication: if it fails, it just returns the empty list: no solutions 
+found. If the list is non-empty, then it succeeded. So PRINT will look 
+like this: 
+</p><ul><pre>HOW TO PRINT paths:
+   SELECT:
+      paths = {}:
+         WRITE "No solution" /
+      ELSE:
+         FOR i IN {1..#paths}:
+            WRITE "Solution", i /
+            FOR move IN paths item i:
+               WRITE "Move", move /
+</pre></ul>
+<p>The main part of <em>paths.to</em> is again hardly different from its
+ predecessor. If the current position is where we wanted to go, then the
+ result is the single empty path {{}}. If the routine fails, it returns 
+no paths, i.e. {}. Otherwise, for each possible new position from the 
+current position, it gets all paths from the new position to the aim. 
+For each of these paths it adds the boat-load that created the new 
+position to the front of the path. Obviously, if no paths are possible 
+then it will not add the boat-load to any path. 
+</p><ul><pre>HOW TO RETURN position paths.to aim:
+   SHARE looking
+   IF position in looking OR NOT safe position: RETURN failure
+   IF position = aim: RETURN success
+   INSERT position IN looking
+   RETURN all.paths
+all.paths:
+   PUT {} IN results
+   FOR boat.load IN possible.from position:
+      PUT new.position paths.to aim IN paths
+      FOR path IN paths:
+         INSERT path with boat.load IN results
+   RETURN results
+new.position: RETURN position altered.for boat.load
+success: RETURN {{}}
+failure: RETURN {}
+</pre></ul>
+<p>And now to show it works: 
+</p><ul><pre>&gt;&gt;&gt; WRITE start
+<i>{["N"]: {"cabbage"; "farmer"; "goat"; "wolf"}; ["S"]: {}}
+</i>&gt;&gt;&gt; WRITE aim
+<i>{["N"]: {}; ["S"]: {"cabbage"; "farmer"; "goat"; "wolf"}}
+</i>&gt;&gt;&gt; PRINT start paths.to aim
+<i>Solution 1
+Move {"farmer"; "goat"}
+Move {"farmer"}
+Move {"cabbage"; "farmer"}
+Move {"farmer"; "goat"}
+Move {"farmer"; "wolf"}
+Move {"farmer"}
+Move {"farmer"; "goat"}
+Solution 2
+Move {"farmer"; "goat"}
+Move {"farmer"}
+Move {"farmer"; "wolf"}
+Move {"farmer"; "goat"}
+Move {"cabbage"; "farmer"}
+Move {"farmer"}
+Move {"farmer"; "goat"}</i>
+</pre></ul>
+<h2><a name="HDR4">Solving other problems </a></h2>
+<p>Now that the program takes most of its information from 
+data-structures, it's interesting to try and solve a different problem 
+with the same program. 
+</p><p>Consider this one: you have two jugs of different capacities, say <i>j</i> litres and <i>k</i>
+ litres. You are allowed to empty either jug, fill either jug, or pour 
+one into the other until the one is empty, or the other is full. The 
+problem is, what series of actions are necessary to end up with the jugs
+ containing <i>m</i> and <i>n</i> litres? 
+</p><p>Right, let's call the two jugs A and B, and represent the state 
+of the two jugs as a table of their contents. For instance, {["A"]: 8; 
+["B"]: 5} shows that A contains 8 litres and B 5. We can represent the 
+set of allowable actions (the target <em>allowable</em>) as a list of 
+actions, where each action is a compound giving the type of action, and 
+the name of the jug. For instance ("Fill", "A"). 
+</p><ul><pre>&gt;&gt;&gt; PUT {} IN allowable
+&gt;&gt;&gt; FOR action IN {"Fill"; "Empty"; "Pour"}:
+       FOR jug IN "AB":
+          INSERT (action, jug) IN allowable
+
+</pre></ul>
+<p>(The action ("Pour", "A") means pour A into B.) 
+</p><p>Now, although strictly speaking, the actions possible from a 
+given situation depend on whether the jugs are empty or full, and so on,
+ it actually doesn't matter, because if you fill an already full jug, or
+ empty an already empty one, you get the same situation, and the program
+ ensures that situations don't get repeated, so we don't have to worry. 
+Therefore, <em>possible.from</em> is very simple: 
+</p><ul><pre>HOW TO RETURN possible.from position:
+   SHARE allowable
+   RETURN allowable
+</pre></ul>
+<p>There are also no illegal states: 
+</p><ul><pre>&gt;&gt;&gt; PUT {} IN illegal
+</pre></ul>
+<p>Finally, we have to provide an <em>altered.for</em> for the new representations. To be able to carry out the actions like Fill we have to know the capacities of the jugs: 
+</p><ul><pre>&gt;&gt;&gt; PUT {} IN full
+&gt;&gt;&gt; PUT 8 IN full["A"]
+&gt;&gt;&gt; PUT 5 IN full["B"]
+</pre></ul>
+<p>The only unobvious case is pouring: the amount that you pour is 
+either the contents of the whole jug, or as much as will fit, whichever 
+is less: 
+</p><ul><pre>HOW TO RETURN amount altered.for actions:
+   SHARE full
+   FOR action, jug IN actions:
+      SELECT:
+         action = "Empty": PUT 0 IN amount[jug]
+         action = "Fill": PUT full[jug] IN amount[jug]
+         action = "Pour":
+            PUT min {amount[jug]; full[other]-amount[other]} IN x
+            PUT amount[other] + x IN amount[other]
+            PUT amount[jug] - x IN amount[jug]
+   RETURN amount
+other:
+   RETURN opposite jug
+</pre></ul>
+<p>Obviously, opposite "A" gives "B", and vice-versa. Now to try it (the output format of PRINT has also been changed): 
+</p><ul><pre>&gt;&gt;&gt; PUT {}, {} IN start, aim
+&gt;&gt;&gt; PUT 0, 0 IN start["A"], start["B"]
+&gt;&gt;&gt; PUT 4, 0 IN aim["A"], aim["B]
+&gt;&gt;&gt; PRINT start paths.to aim
+<i>Solution 1
+Fill A, Pour A, Empty B, Pour A, Fill A, Pour A, Empty B, Pour A,
+Empty B, Pour A, Fill A, Pour A, Fill A, Empty A, Pour B, Fill B,
+Pour B, Empty A, Pour B, Fill B, Pour B, Fill B, Pour B, Empty A,
+Pour B
+
+...
+
+Solution 26
+Fill B, Pour B, Fill B, Pour B, Empty A, Pour B, Fill B, Pour B,
+Fill B, Pour B, Empty A, Pour B</i>
+</pre></ul>
+<h2><a name="HDR5">Exercise </a></h2>
+<p>Finally, as an exercise, consider what needs to be changed in order 
+to solve the Towers of Hanoi problem. If you just use the restriction 
+that a disk may not be placed on a smaller disk, it gives 12 solutions 
+for moving just two disks from one pile to another! Here's the longest 
+(the first line means ``move piece 1 from rod a to rod c''): 
+</p><ul><pre><i>Move (1, "a", "c")
+Move (1, "c", "b")
+Move (2, "a", "c")
+Move (1, "b", "c")
+Move (1, "c", "a")
+Move (2, "c", "b")
+Move (1, "a", "c")
+Move (1, "c", "b")
+</i></pre></ul>
+<p>If you add the restriction that the same piece should not be moved twice in succession, you get two solutions: 
+</p><ul><pre><i>Solution 1
+Move (1, "a", "b")
+Move (2, "a", "c")
+Move (1, "b", "a")
+Move (2, "c", "b")
+Move (1, "a", "b")
+Solution 2
+Move (1, "a", "c")
+Move (2, "a", "b")
+Move (1, "c", "b")
+</i></pre></ul>
+<h2><a name="HDR6">Conclusion </a></h2>
+<p>Experience with other programming languages can mislead one into 
+thinking that because functions in ABC can have no side-effects certain 
+practices are impossible. This article has attempted to show that in 
+fact this is not so, largely because of the ease of returning values of 
+any type in ABC. 
+</p><h2><a name="HDR7">References</a></h2>
+<p>[1] Tim Budd, <i>(Extremely) Simple Logic Programming in </i>B, B Newsletter, 4, 1985, ISSN 0169-0191, CWI, Amsterdam, 1985.
+</p><p>[2] Steven Pemberton, <i>Backtracking in B: The Budd Challenge</i>, B Newsletter, 5, 1986, ISSN 0169-0191, CWI, Amsterdam, 1986.
+</p><hr><h3>Note</h3>
+This documents is a revised version of [2]. The original article 
+referred to the programming language B; this has been updated to the 
+revised version of B, called ABC.
+<p>
+Copyright © Steven Pemberton, CWI, Amsterdam
+
+</p></body></html>

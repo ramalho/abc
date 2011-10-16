@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head>
+  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+  <title>ABC: Program Examples</title>
+  <link href="abc.css" rel="stylesheet" type="text/css">
+</head>
+<body bgcolor="#ffff60">
+
+<h1>ABC: Program Examples</h1>
+
+The (second) best way to appreciate the power of ABC is to see some
+examples (the first is to use it). In the examples, &gt;&gt;&gt; is the
+prompt from ABC. <p>
+Some of these articles are followed by a link to a
+source file for the program.
+These source files were produced by using the 'abc -p' option for packing a
+workspace. To unpack it in your own workspaces, save the file as F, choose the
+name of your new workspace W, and say:
+</p><blockquote>
+	abc -u -w W F
+</blockquote>
+(you may freely choose the names W and F, but avoid using an
+existing workspace name for W).
+
+<ul>
+<li> <a href="http://homepages.cwi.nl/%7Esteven/abc/examples/tel.html">A Telephone List</a></li>
+<li> <a href="http://homepages.cwi.nl/%7Esteven/abc/examples/xref.html">A Cross-reference Indexer</a></li>
+<li> <a href="http://homepages.cwi.nl/%7Esteven/abc/examples/adventure.html">An Adventure Game</a> (<a href="http://www.cwi.nl/ftp/abc/examples/advent/advent.ftp">source</a>)</li>
+<li> <a href="http://homepages.cwi.nl/%7Esteven/abc/examples/grammar.html">Grammar Analysis</a> (<a href="http://www.cwi.nl/ftp/abc/examples/grammar/grammar.ftp">source</a>)</li>
+<li> <a href="http://homepages.cwi.nl/%7Esteven/abc/examples/logic.html">Logic Programming</a></li>
+<li><a href="http://homepages.cwi.nl/%7Esteven/abc/examples/approximate.html">Approximate Numbers</a></li>
+<li>The <a href="http://www.cwi.nl/ftp/abc/examples/eliza/eliza.ftp">source</a> of a version of Gerry Weizenbaum's Eliza program, as presented in
+the ABC book. For more details of how the program works, see the book.
+<p>
+To use Eliza interactively, just run the command ELIZA.
+</p><p>
+To watch Eliza talking to someone else, run the command
+</p><blockquote>
+        SESSION grammar
+</blockquote>
+where 'grammar' is some grammar to generate English sentences.
+There is only one such grammar supplied, paranoid, so you say:
+<blockquote>
+        SESSION paranoid
+</blockquote>
+
+If the grammar is empty, then Eliza tries to psychoanalyse herself:
+
+<blockquote>
+        SESSION {}
+</blockquote>
+
+To quote from her interacting with herself:
+<blockquote>
+        &gt; Do you enjoy this sort of interaction?<br>
+        What a question!
+</blockquote>
+</li><li>There are some more examples in the <a href="http://homepages.cwi.nl/%7Esteven/abc/newsletter/">online newsletters</a>: a histogram
+	program, a solution to the Eight Queens problem, and a
+	general-purpose database program.</li>
+</ul>
+    <hr>
+    <address><a href="mailto:steven.pemberton@cwi.nl">Steven Pemberton</a></address>
+<!-- Created: Mon Feb 18 12:42:59 CET 2002 -->
+<!-- hhmts start -->
+Last modified: Mon Feb 18 12:47:30 CET 2002
+<!-- hhmts end -->
+
+
+
+</body></html>

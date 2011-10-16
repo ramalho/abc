@@ -1,0 +1,344 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<link href="abc.css" rel="stylesheet" type="text/css">
+<title>ABC QUICK REFERENCE</title>
+<!-- Changed by: Steven Pemberton,  1-Nov-1996 -->
+</head>
+<body bgcolor="yellow">
+
+<h1>ABC QUICK REFERENCE</h1>
+
+<ul>
+<li> <a href="#COMMANDS">COMMANDS</a>
+
+</li><li> <a href="#HOWTOs">HOW-TO's (= Procedures and functions)</a>
+<ul>
+<li> <a href="#Refinements">Refinements (after the commands of a how-to)</a>
+
+</li><li> <a href="#Terminating">Terminating commands</a>
+</li></ul>
+</li><li> <a href="#EXPRESSIONS">EXPRESSIONS AND ADDRESSES</a>
+
+</li><li> <a href="#TESTS">TESTS</a>
+
+</li><li> <a href="#PREDEFINED">PREDEFINED FUNCTIONS AND PREDICATES</a>
+<ul>
+<li> <a href="#numbers">Functions and predicates on numbers</a>
+
+</li><li> <a href="#texts">Functions on texts</a>
+
+</li><li> <a href="#tables">Function on tables</a>
+
+</li><li> <a href="#trains">Functions and predicates on trains</a>
+
+</li><li> <a href="#all">Functions on all types</a>
+</li></ul>
+</li><li> <a href="#CHARACTERS">THE CHARACTERS</a>
+</li></ul>
+
+<a name="COMMANDS"><h2>COMMANDS</h2>
+
+<dl>
+<dt> 	  WRITE	expr
+</dt><dd>  			Write to screen;
+					/ before or after expr gives new line
+</dd><dt> 	  READ address EG expr
+</dt><dd> 		Read expression	from terminal to address; expr is example
+</dd><dt>	  READ address RAW
+</dt><dd>		Read line of text
+</dd><dt>	  PUT expr IN address
+</dt><dd>		Put value of expr in address
+</dd><dt>	  SET RANDOM expr
+</dt><dd>		Start random sequence for random and choice
+</dd><dt>	  REMOVE expr FROM list
+</dt><dd>		Remove one element from	list
+</dd><dt>	  INSERT expr IN list
+</dt><dd>		Insert in right	place
+</dd><dt>	  DELETE address
+</dt><dd>		Delete permanent location or table entry
+</dd><dt>	  PASS
+</dt><dd>				Do nothing
+</dd><dt>	  KEYWORD expr KEYWORD ...
+</dt><dd>	Execute	user-defined command
+</dd><dt>	  KEYWORD
+</dt><dd>			Execute	refined	command
+<br>
+</dd><dt>	  CHECK
+</dt><dd>	test			Check test and stop if it fails
+</dd><dt>	  IF test: <br> &nbsp;&nbsp;&nbsp;commands
+</dt><dd>			If test	succeeds, execute commands;
+			    no ELSE allowed
+</dd><dt>	  SELECT: <br>
+&nbsp;&nbsp;&nbsp;test: commands <br>
+&nbsp;&nbsp;&nbsp;...			 <br>     
+&nbsp;&nbsp;&nbsp;test: commands		 <br>     
+</dt><dd>			Select one alternative:
+try each test in order (one must succeed; the last test may be ELSE)
+</dd><dt>	  WHILE	test:  <br>
+&nbsp;&nbsp;&nbsp; commands
+</dt><dd>	As long	as test	succeeds execute commands
+</dd><dt>	  FOR name,... IN train:  <br>
+&nbsp;&nbsp;&nbsp;commands
+</dt><dd>	Take each element of train in turn
+
+</dd></dl>
+</a>
+
+<a name="HOWTOs"><h2>HOW-TO's</h2>
+
+<dt>	  HOW TO KEYWORD ...: 	     commands
+</dt><dd>		Define new command KEYWORD ...
+
+</dd><dt>	  HOW TO RETURN f: commands
+</dt><dd>		Define new function f with no arguments (returns a value)
+
+</dd><dt>	  HOW TO RETURN f x:	     commands
+</dt><dd>		Define new function f with one argument
+
+</dd><dt>	  HOW TO RETURN x f y: 	     commands
+</dt><dd>		Define new function f with two arguments
+
+</dd><dt>	  HOW TO REPORT pr: commands
+</dt><dd>		Define new predicate pr	with no	arguments (succeeds/fails)
+
+</dd><dt>	  HOW TO REPORT pr x: 	     commands
+</dt><dd>		Define new predicate pr	with one argument
+
+</dd><dt>	  HOW TO REPORT x pr y: 	     commands
+</dt><dd>		Define new predicate pr	with two arguments
+<br>
+
+</dd><dt>	  SHARE name,...
+</dt></a><dd><a name="HOWTOs">		Share permanent	locations (before	commands of how-to)
+
+
+</a>
+<a name="Refinements"><h3>Refinements (after the commands of a how-to)</h3>
+
+<dl>
+<dt>	  KEYWORD: commands
+</dt><dd>		Define command refinement
+</dd><dt>	  name: commands
+</dt><dd>		Define expression- or test-refinement
+
+</dd></dl>
+</a>
+<a name="Terminating"><h3>Terminating commands</h3>
+
+<dl>
+<dt>	  QUIT
+</dt><dd>				Leave command how-to or	command	refinement, or leave ABC
+</dd><dt>	  RETURN expr
+</dt><dd>			Leave function how-to or expression refinement, return value of expr
+</dd><dt>	  REPORT test
+</dt><dd>			Leave predicate	how-to or test-refinement, report outcome of test
+</dd><dt>	  SUCCEED
+</dt><dd>			The same, report success
+</dd><dt>	  FAIL
+</dt><dd>				The same, report failure
+
+</dd></dl>
+</a>
+
+<a name="EXPRESSIONS"><h2>EXPRESSIONS AND ADDRESSES</h2>
+<dl>
+
+<dt>	  666, 3.14, 3.14e-9
+</dt><dd>		Exact constants
+
+</dd><dt>	  expr,expr,...
+</dt><dd>			Compound
+</dd><dt>	  name,name,...
+</dt><dd>			Naming (may also be used as address)
+
+</dd><dt>	  text@p
+</dt><dd>			"ABCD"@2 = "BCD" (also address)
+</dd><dt>	  text|q
+</dt><dd>			"ABCD"|3 = "ABC" (also address)
+</dd><dt>	  text@p|q
+</dt><dd>			"ABCD"@2|1 = "BCD"|1 = "B"
+
+</dd><dt>	  table[expr]
+</dt><dd>			Table selection	(also address)
+
+</dd><dt>	  "Jan", 'Feb', 'Won''t!'
+</dt><dd>		Textual	displays (empty: "" or '')
+</dd><dt>	  "value = `expr`;"
+</dt><dd>		Conversion of expr to text
+
+</dd><dt>	  {1; 2; 2; ...}
+</dt><dd>		List display (empty: {})
+</dd><dt>	  {1..9; ...}, {"a".."z"; ...}
+</dt><dd>	List of	consecutive values
+
+</dd><dt>	  {["Jan"]: 1; ["Feb"]: 2; ...}
+</dt><dd>	Table display (empty: {})
+
+</dd><dt>	  f, f x, x f y
+</dt><dd>			Result of function f (no permanent effects)
+</dd><dt>	  name
+</dt><dd>				Result of refinement (no permanent effects)
+
+</dd></dl>
+</a>
+
+<a name="TESTS"><h2>TESTS</h2>
+<dl>
+
+<dt>	  x &lt; y, x &lt;= y, x &gt;= y, x &gt; y,  x = y, x &lt;&gt; y, 0 &lt;= d &lt; 10
+</dt><dd>	Order tests (&lt;&gt; means 'not equals')
+
+</dd><dt>	  pr, pr x, x pr y
+</dt><dd>		Outcome	of predicate pr	(no permanent effects)
+</dd><dt>	  name
+</dt><dd>				Outcome	of refinement (no permanent effects)
+
+</dd><dt>	  test AND test AND ...
+</dt><dd>		Fails as soon as one of	the tests fails
+</dd><dt>	  test OR test OR ...
+</dt><dd>		Succeeds as soon as one	of the tests succeeds
+</dd><dt>	  NOT test
+
+
+</dt><dt>	  SOME name,... IN train HAS test
+
+</dt><dd>					Sets name, ... on success
+</dd><dt>	  EACH name,... IN train HAS test
+
+</dt><dd>					Sets name, ... on failure
+</dd><dt>	  NO   name,... IN train HAS test
+
+</dt><dd>					Sets name, ... on failure
+
+</dd></dl>
+</a>
+
+<a name="PREDEFINED">
+<h2>PREDEFINED FUNCTIONS AND PREDICATES</h2>
+</a><a name="numbers"><h3>Functions and predicates on numbers</h3>
+<dl>
+
+
+<dt>	  ~x
+</dt><dd>				Approximate value of x
+</dd><dt>	  exactly x
+</dt><dd>			Exact value of x
+</dd><dt>	  exact x
+</dt><dd>			Test if	x is exact
+</dd><dt>	  +x, x+y, x-y, -x, x*y, x/y
+</dt><dd>	Plain arithmetic
+</dd><dt>	  x**y
+</dt><dd>				x raised to the	power y
+</dd><dt>	  root x, n root x
+</dt><dd>		Square root, n-th root
+</dd><dt>	  abs x, sign x
+</dt><dd>			Absolute value,	sign (=	-1, 0, or +1)
+</dd><dt>	  round x, floor x, ceiling x
+</dt><dd>	Rounded	to whole number
+</dd><dt>	  n round x
+</dt><dd>			x rounded to n digits after decimal point
+</dd><dt>	  a mod n
+</dt><dd>			Remainder of a on division by n
+</dd><dt>	  */x
+</dt><dd>				Numerator of exact number x
+</dd><dt>	  /*x
+</dt><dd>				Denominator
+</dd><dt>	  random
+</dt><dd>			Random approximate number r, 0 &lt;= r &lt; 1
+</dd><dt>	  e, exp x
+</dt><dd>			Base of	natural	logarithm, exponential function
+</dd><dt>	  log x, b log x
+</dt><dd>		Natural	logarithm, logarithm to	the base b
+</dd><dt>	  pi, sin x, cos x, tan x, arctan x
+
+</dt><dd>					Trigonometric functions, with x	in radians
+</dd><dt>	  angle (x, y), radius (x, y)
+</dt><dd>	Angle of and radius to point (x, y)
+</dd><dt>	  c sin x, c cos x, c tan x
+</dt><dd>	Similar, with the circle divided into c	parts
+</dd><dt>	  c arctan x, c angle (x, y)
+</dt><dd>	    (e.g. 360 for degrees)
+</dd><dt>	  now
+</dt><dd>				e.g. (1999, 12,	31, 23,	59, 59.999)
+
+</dd></dl>
+</a>
+<a name="texts"><h3>Functions on texts</h3>
+<dl>
+
+
+<dt>	  t^u
+</dt><dd>				t and u	joined into one	text
+</dd><dt>	  t^^n
+</dt><dd>				t repeated n times
+</dd><dt>	  lower t
+</dt><dd>			lower "aBc" = "abc"
+</dd><dt>	  upper t
+</dt><dd>			upper "aBc" = "ABC"
+</dd><dt>	  stripped t
+</dt><dd>			Strip leading and trailing spaces from t
+</dd><dt>	  split t
+</dt><dd>			Split text t into words
+
+</dd></dl>
+</a>
+<a name="tables"><h3>Function on tables</h3>
+<dl>
+
+
+<dt>	  keys table
+</dt><dd>			List of	all keys in table
+
+</dd></dl>
+</a>
+<a name="trains"><h3>Functions and predicates on trains</h3>
+<dl>
+
+<dt>	  #train
+</dt><dd>			Number of elements in train
+</dd><dt>	  e#train
+</dt><dd>			Number of elements equal to e
+</dd><dt>	  e in train, e not.in train
+</dt><dd>	Test for presence or absence
+</dd><dt>	  min train
+</dt><dd>			Smallest element of train
+</dd><dt>	  e min train
+</dt><dd>			Smallest element larger	than e
+</dd><dt>	  max train, e max train
+</dt><dd>	Largest	element
+</dd><dt>	  train item n
+</dt><dd>			n-th element
+</dd><dt>	  choice train
+</dt><dd>			Random element
+
+</dd></dl>
+</a>
+<a name="all"><h3>Functions on all types</h3>
+<dl>
+
+<dt>	  x&lt;&lt;n
+</dt><dd>				x converted to text, aligned left in width n
+</dd><dt>	  x&gt;&lt;n
+</dt><dd>				The same, centred
+</dd><dt>	  x&gt;&gt;n
+</dt><dd>				The same, aligned right
+
+</dd></dl>
+</a>
+
+<a name="CHARACTERS"><h2>THE CHARACTERS</h2>
+</a><dl><a name="CHARACTERS">
+
+This is the order of all characters that may occur in a text. (The
+first is a space.)
+
+<pre>&nbsp;!"#$%&amp;'()*+,-./		
+0123456789:;&lt;=&gt;?
+@ABCDEFGHIJKLMNO		
+PQRSTUVWXYZ[\]^_
+`abcdefghijklmno
+pqrstuvwxyz{|}~
+</pre>
+</a>
+
+</dl></dd></body></html>

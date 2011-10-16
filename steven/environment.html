@@ -1,0 +1,44 @@
+<!--?xml version="1.0"?-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<title>ABC: The Environment</title>
+<link href="abc.css" rel="stylesheet" type="text/css">
+</head>
+<body bgcolor="#ffff60">
+<h1>ABC: The Environment</h1>
+
+<p>The implementation includes a programming environment that makes
+producing programs very much easier, since it knows a lot about the
+language, and can therefore do much of the work for you. For
+instance, if you type a W, the system suggests a command completion
+for you:</p>
+
+<pre>    W?RITE ?
+</pre>
+
+<p>If that is what you want, you press [tab], and carry on typing
+the expression; if you wanted WHILE, you type an H, and the system
+changes the suggestion to match:</p>
+
+<pre>    WH?ILE ?:
+</pre>
+
+<p>This mechanism works for commands you define yourself too.
+Similarly, if you type an open bracket or quote, you get the
+closing bracket or quote for free. You can ignore the suggestions
+if you want, and just type the commands full out.</p>
+
+<p>There is support for workspaces for developing different
+programs. Within each workspace variables are persistent, so that
+if you stop using ABC and come back later, your variables are still
+there as you left them. This obviates the need for file-handling
+facilities: there is no conceptual difference between a variable
+and a file in ABC.</p>
+
+<p>The language is strongly-typed, but without declarations. Types
+are determined from context.</p>
+
+
+
+</body></html>

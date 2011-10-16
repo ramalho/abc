@@ -1,0 +1,129 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<title>ABC: Some Simple Examples</title>
+<link href="abc.css" rel="stylesheet" type="text/css">
+</head>
+<body bgcolor="#ffff60">
+
+<h1>ABC: Some Simple Examples</h1>
+
+The (second) best way to appreciate the power of ABC is to see some
+examples (the first is to use it). In what follows, &gt;&gt;&gt; is the
+prompt from ABC.
+<p>
+There are five types in the language: two basic -- Numbers and Texts -- and three structured -- Compounds, Lists, and Tables.
+
+</p><h2>Numbers</h2>
+Numbers are unbounded, and stored exact:
+<pre>
+	&gt;&gt;&gt; WRITE 2**1000
+	107150860718626732094842504906000181056140481170553360744375038837
+	035105112493612249319837881569585812759467291755314682518714528569
+	231404359845775746985748039345677748242309854210746050623711418779
+	541821530464749835819412673987675591655439460770629145711964776865
+	42167660429831652624386837205668069376
+
+	&gt;&gt;&gt; PUT 1/(2**1000) IN x
+	&gt;&gt;&gt; WRITE 1 + 1/x
+	107150860718626732094842504906000181056140481170553360744375038837
+	035105112493612249319837881569585812759467291755314682518714528569
+	231404359845775746985748039345677748242309854210746050623711418779
+	541821530464749835819412673987675591655439460770629145711964776865
+	42167660429831652624386837205668069377
+</pre>
+Non-exact numbers use machine-precision:
+<pre>	&gt;&gt;&gt; WRITE root 2
+	1.414213562373095
+</pre>
+
+<h2>Texts</h2>
+Texts (strings of characters) are also unbounded:
+<pre>	&gt;&gt;&gt; PUT ("ha " ^^ 3) ^ ("ho " ^^ 3) IN laugh
+	&gt;&gt;&gt; WRITE laugh
+	ha ha ha ho ho ho 
+
+	&gt;&gt;&gt; WRITE #laugh
+	18
+
+	&gt;&gt;&gt; PUT "Hello! "^^1000 IN greeting
+	&gt;&gt;&gt; WRITE #greeting
+	7000
+
+	&gt;&gt;&gt; WRITE greeting|4
+	Hell
+
+	&gt;&gt;&gt; WRITE greeting@4|3
+	lo!
+
+</pre>
+
+<h2>Lists</h2>
+Lists are sorted lists of values of any one other type:
+<pre>	&gt;&gt;&gt; WRITE {1..10}
+	{1; 2; 3; 4; 5; 6; 7; 8; 9; 10}
+	&gt;&gt;&gt; PUT {1..10} IN l
+	&gt;&gt;&gt; REMOVE 5 FROM l
+	&gt;&gt;&gt; INSERT 4 IN l
+	&gt;&gt;&gt; INSERT pi IN l
+	&gt;&gt;&gt; WRITE l
+	{1; 2; 3; 3.141592653589793; 4; 4; 6; 7; 8; 9; 10}
+</pre>
+You can have lists of any type, so here is a list of lists:
+<pre>	&gt;&gt;&gt; PUT {} IN ll
+	&gt;&gt;&gt; FOR i IN {1..3}:
+	        INSERT {1..i} IN ll
+	&gt;&gt;&gt; WRITE ll
+	{{1}; {1; 2}; {1; 2; 3}}
+	&gt;&gt;&gt; FOR l IN ll:
+	        WRITE l /
+	{1}
+	{1; 2}
+	{1; 2; 3}
+	&gt;&gt;&gt; WRITE #ll
+	3
+
+</pre>
+
+<h2>Compounds</h2>
+Compounds are like records or structures, but without field names:
+<pre>	&gt;&gt;&gt; PUT ("Square root of 2", root 2) IN c
+	&gt;&gt;&gt; WRITE c
+	("Square root of 2", 1.414213562373095)
+	&gt;&gt;&gt; PUT c IN name, value
+	&gt;&gt;&gt; WRITE name
+	Square root of 2
+	&gt;&gt;&gt; WRITE value
+	1.414213562373095
+
+</pre>
+
+<h2>Tables</h2>
+Tables resemble arrays:
+<pre>	&gt;&gt;&gt; PUT {} IN tel
+	&gt;&gt;&gt; PUT 4054 IN tel["Jennifer"]
+	&gt;&gt;&gt; PUT 4098 IN tel["Timo"]
+	&gt;&gt;&gt; PUT 4134 IN tel["Guido"]
+
+	&gt;&gt;&gt; WRITE tel["Jennifer"]
+	4054
+
+</pre>
+You can write all ABC values out. Tables are kept sorted on the keys:
+<pre>	&gt;&gt;&gt; WRITE tel
+	{["Guido"]: 4134; ["Jennifer"]: 4054; ["Timo"]: 4098}
+</pre>
+The <em>keys</em> function returns a list:
+<pre>	&gt;&gt;&gt; WRITE keys tel
+	{"Guido"; "Jennifer"; "Timo"}
+
+	&gt;&gt;&gt; FOR name IN keys tel:
+	       WRITE name, ":", tel[name] /
+	Guido: 4134
+	Jennifer: 4054
+	Timo: 4098
+</pre>
+
+<a href="http://homepages.cwi.nl/%7Esteven/abc/examples/">Some complete example programs</a>
+ <p>
+
+</p></body></html>

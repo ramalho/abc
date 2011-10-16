@@ -1,0 +1,164 @@
+<!--?xml version="1.0" encoding="UTF-8"?-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>ABC: Eight Queens, More or Less</title>
+  <link rel="stylesheet" href="abc.css">
+</head>
+
+<body>
+
+<div>
+<h1 class="Title">Eight Queens, More or Less</h1>
+
+<p class="Author"><em>Steven Pemberton<br>
+CWI, Amsterdam</em></p>
+
+<p class="Body">I was asked what an Eight Queens program would look like in
+ABC. The problem is: can you put eight queens on an (8 by 8) chess board board
+in such a way that they cannot take each other. A queen can take by moving
+vertically, horizontally or diagonally.</p>
+
+<p class="Body">My first version was a fairly traditional version – for
+instance see E.W. Dijkstra's version in the book <em>Structured
+Programming</em> – although of course, I immediately generalised it to any
+number of queens<a href="#pgfId=457073" class="footnote"></a>: </p>
+<pre class="CodeLast">HOW TO QUEENS n:
+    DISPLAY n filled {}</pre>
+
+<p class="Body">The command <em class="Code">DISPLAY</em> just displays the
+board, which is represented as a table whose keys are the row numbers (1 to n),
+and whose items are the column number of the piece for that row: </p>
+<pre class="CodeLast">HOW TO DISPLAY board:
+    IF board = {}:
+        WRITE "No solution" /
+    FOR p IN board:
+        WRITE "# "^^(p-1), "O "
+        WRITE "# "^^(#board - p) /</pre>
+
+<p class="Body">The work of finding a solution for the problem is done by the
+function <em class="Code">filled</em> . If the board is already of size n then
+an answer has already been found. Otherwise, a piece is added for the next row:
+each possible piece is tried, and if one is found that is 'safe'– it can't be
+taken by any of the other queens on the board – it is placed on the board (by
+<em class="Code">board'</em> ), and <em class="Code">filled</em> is called to
+fill the next row. If the result of that call is successful, then that result
+is returned, otherwise the next piece for the current row is tried. If no piece
+is found, then the empty board is returned, to indicate failure.</p>
+
+<p class="Body">The check for safeness uses properties of row and column
+numbers to see if a position is being attacked.</p>
+
+<p class="Body">The function uses backtracking and the fact that ABC functions
+can't produce side-effects. See my article <a href="http://www.cwi.nl/%7Esteven/abc/examples/logic.html">Backtracking in B</a>
+in the ABC Newsletter 5 for more details about backtracking in ABC.</p>
+<pre class="CodeLast">HOW TO RETURN n filled board:
+    IF #board = n: RETURN board
+    FOR p IN {1..n}:
+        IF safe:
+            PUT n filled board' IN new
+        IF new &lt;&gt; {}: RETURN new
+    RETURN {}
+safe: REPORT col AND left AND right
+col: REPORT p not.in board
+left: REPORT NO r IN keys board HAS r+board[r] = #board+1+p
+right: REPORT NO r IN keys board HAS r-board[r] = #board+1-p
+board':
+    PUT p IN board[#board+1]
+    RETURN board</pre>
+
+<p></p>
+<pre class="CodeLast">&gt;&gt;&gt; QUEENS 8
+O # # # # # # # 
+# # # # O # # # 
+# # # # # # # O 
+# # # # # O # # 
+# # O # # # # # 
+# # # # # # O # 
+# O # # # # # # 
+# # # O # # # # </pre>
+
+<div>
+<h2 class="Heading">A More Direct Version</h2>
+
+<p class="Body">However, I also decided to try a more direct solution, by
+simulating what you would do by hand more closely. Here the board is again a
+table with the row number as key, but with a list of numbers as items. These
+numbers represent which positions on the current row are not being attacked. So
+you start out with a full board, which must then be emptied: </p>
+<pre class="CodeLast">HOW TO QUEENS' n:
+    PUT {} IN board
+    FOR i IN {1..n}:
+        PUT {1..n} IN board[i]
+    DISPLAY' 1 emptied board</pre>
+
+<p></p>
+<pre class="CodeLast">HOW TO DISPLAY' board:
+    IF board = {}:
+        WRITE "No solution" /
+    FOR row IN board:
+        CHECK #row = 1
+        PUT min row IN p
+        WRITE "# "^^(p-1), "O "
+        WRITE "# "^^(#board - p) /</pre>
+
+<p class="Body">The work is done by the function <em class="Code">emptied</em>.
+You no longer have to check if a piece is safe or not: for each row you have
+just the list of safe pieces available. When you choose a piece, all the
+positions that are attacked by this piece are then removed from the board, and
+the next row is tried. </p>
+<pre class="CodeLast">HOW TO RETURN n emptied board:
+    IF n &gt; #board: RETURN board
+    FOR p IN board[n]:
+        PUT (n+1) emptied board' IN new
+        IF new &lt;&gt; {}: RETURN new
+    RETURN {}
+board':
+    PUT {p} IN board[n]
+    FOR row IN {n+1..#board}:
+        PUT board[row] less {p; p+(row-n); p-(row-n)} IN board[row]
+    RETURN board</pre>
+
+<p class="Body">This uses a small function to return the difference between two
+lists: </p>
+<pre class="CodeLast">HOW TO RETURN l1 less l2:
+    FOR i IN l2:
+        IF i in l1:
+            REMOVE i FROM l1
+    RETURN l1</pre>
+
+<p></p>
+<pre class="CodeLast">&gt;&gt;&gt; QUEENS' 8
+O # # # # # # # 
+# # # # O # # # 
+# # # # # # # O 
+# # # # # O # # 
+# # O # # # # # 
+# # # # # # O # 
+# O # # # # # # 
+# # # O # # # #</pre>
+
+<p></p>
+<pre class="CodeLast">&gt;&gt;&gt; QUEENS' 11
+O # # # # # # # # # # 
+# # O # # # # # # # # 
+# # # # O # # # # # # 
+# # # # # # O # # # # 
+# # # # # # # # O # # 
+# # # # # # # # # # O 
+# O # # # # # # # # # 
+# # # O # # # # # # # 
+# # # # # O # # # # # 
+# # # # # # # O # # # 
+# # # # # # # # # O #</pre>
+
+<p class="Body">As it turns out, this version runs faster than the first
+version. The reason for this is that you have to search much less to find a
+candidate piece for a row, and when you reach a row where all positions are
+attacked, you know it immediately, without having to check each position
+separately. </p>
+</div>
+</div>
+
+
+</body></html>

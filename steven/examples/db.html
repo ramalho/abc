@@ -1,0 +1,355 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML EXPERIMENTAL 970324//EN">
+<html><head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="STYLESHEET" href="abc.css">
+  <title>ABC: A General-Purpose Database</title>
+</head>
+
+<body>
+
+<div>
+<h1 class="Title">A General-Purpose Database</h1>
+
+<p class="Author"><em>Steven Pemberton <br>
+CWI, Amsterdam</em></p>
+
+<p class="Body">Someone came to the database experts in our department and said
+that the mailing lists she had to administer were getting unmanageable. They
+had originally been prepared by different people, so they were all in a
+different format, using different conventions, and in different files. She
+needed a program to help her manage them, and she sketched the facilities she
+needed:</p>
+
+<blockquote>
+  <p class="Body"><em>The database would be quite small, a couple of thousand
+  records or so. Each record would have a number of standard fields: name,
+  institute, department, address, city, country, email address, and so on.
+  There should also be a 'code' field where she could say which mailing lists
+  this address belonged to, such as ABC, the Operating System list she managed,
+  and so on.</em></p>
+
+  <p class="Body"><em>She should then be able to look up entries, and above all
+  make selections which could then be printed off as labels. She should be able
+  to find out how large a selection was. She should also be able to print all
+  records out for a card index on her desk.</em></p>
+
+  <p class="Body"><em>To aid searching, certain fields such as country, should
+  be constrained so that only unique values are used; not United Kingdom in one
+  case, and Great Britain in another.</em></p>
+</blockquote>
+
+<p class="Body">At this point, I got called in on the discussions, and after
+rejecting some possibilities (the standard database package is only available
+on one computer that is not accessible for everyone who needs to access the
+mailing lists), without further ado, three of us sat down at a workstation, and
+in an afternoon wrote the program in ABC.</p>
+
+<div>
+<h2 class="Heading"><a name="pgfId=456823"></a> Data Representation</h2>
+
+<p class="Body">A first decision we had to take was how we were going to
+represent the database.</p>
+
+<p class="Body">It was obvious from the specification that we didn't know
+exactly how many fields there were going to be, nor what they were, and
+furthermore that it was likely to change, so we needed to be as flexible as
+possible.</p>
+
+<p class="Body">Therefore we decided to have a structure defining the allowable
+field names, and each record would then be a table from these field names to
+the field value. Each record would be regarded as having an entry for each
+field, though if it were empty, it wouldn't be physically there. This meant
+that if we added a new field-name to the defining structure, all records
+effectively got an empty field with that name.</p>
+
+<p class="Body">It also meant that if a field-name was later deleted, all those
+fields in the database became no longer accessible, they apparently
+disappeared, though they were physically still there, so that if later the
+field name was reinstated, the values would reappear.</p>
+
+<p class="Body">So to define the allowable field names:</p>
+<pre class="CodeLast">PUT split "Name Institute Dept Address City Postcode Land Code" IN field.names</pre>
+
+<p class="Body">An entry in the database might then look like:</p>
+<pre class="CodeLast">{["Name"]: "Jane Smith"; ["Institute"]: "Univ. of Lighf"; ["Land"]: "Erewhon"}</pre>
+
+<p class="Body">Missing fields are considered present but empty.</p>
+
+<p class="Body">Now, given this format, we can immediately write a how-to to
+show a record:</p>
+<pre class="CodeLast">HOW TO SHOW RECORD record:
+    SHARE field.names
+    FOR name IN field.names:
+        IF name IN keys record:
+            WRITE name, ": ", record[name]/</pre>
+
+<p class="Body">and one to read a record:</p>
+<pre class="CodeLast">HOW TO GET record:
+    SHARE field.names
+    PUT {} IN record
+    FOR name IN field.names:
+        WRITE name, ": "
+            READ field RAW
+            IF field &lt;&gt; "":
+                PUT field IN record[name]</pre>
+
+<p class="Body">The whole database is just a set of records (with no implied
+ordering) So to display the whole database, record by record, we can use:</p>
+<pre class="CodeLast">HOW TO SHOW db:
+    FOR r IN db:
+        SHOW RECORD r
+        WRITE /</pre>
+
+<p class="Body">To add a record to the database:</p>
+<pre class="CodeLast">HOW TO ADD TO db:
+    GET record
+    IF record &lt;&gt; {}: INSERT record IN db</pre>
+</div>
+
+<div>
+<h2 class="Heading">Selection</h2>
+
+<p class="Body">A basic action you want to do with a database is select records
+on the basis of certain criteria. To do this, we shall write some functions
+that given a database and a set of selection criteria, deliver a database that
+is a sub-set of the original one.</p>
+
+<p class="Body">The represention we shall use for the criteria is just a
+record: for each record in the database if the record matches in the required
+way with the criteria-record, then it will form a part of the result:</p>
+<pre class="CodeLast">HOW TO RETURN db equals criteria:
+    PUT {} IN result
+    FOR record IN db:
+        IF matches:
+            INSERT record IN result
+    RETURN result
+matches:
+    REPORT EACH name IN keys criteria HAS field.match
+field.match:
+    REPORT name in keys record AND record[name] = criteria[name]</pre>
+
+<p class="Body">This version gives an exact match, so if we say</p>
+<pre class="CodeLast">SHOW db matches {["Land"]: "UK"}</pre>
+
+<p class="Body">then we'll get all records with the Land field equal to UK. If
+we want a partial match, we can use:</p>
+<pre class="Code">HOW TO RETURN db contains criteria:
+    PUT {} IN result
+    FOR record IN db:
+        IF matches:
+            INSERT record IN result
+    RETURN result
+matches:
+    REPORT EACH name IN keys criteria HAS field.match
+field.match:
+    REPORT name IN keys record AND lower record[name] includes lower criteria[r]</pre>
+
+<p class="Body">and <em class="Code">includes</em> reports whether the one text
+includes the other:</p>
+<pre class="CodeLast">HOW TO REPORT t includes s:
+    REPORT SOME i IN {1..#t-#s+1} HAS t@i|#s = s</pre>
+
+<p class="Body">The how-to <em class="Code">contains</em> matches any record
+where the field contains the relevant criteria, ignoring case. So:</p>
+<pre class="CodeLast">SHOW db contains {["Land"]: "UK"}</pre>
+
+<p class="Body">would match for instance UK and Ukraine.</p>
+
+<p class="Body">Note that because these functions take a database as parameter,
+we can chain them:</p>
+<pre class="CodeLast">SHOW (db equals {["Land"]: "UK"}) contains {["City"]: "York"}</pre>
+
+<p class="Body">which selects all records that contain the city York, in the
+country UK. Also note that</p>
+<pre class="CodeLast">SHOW db contains {["Land"]: ""}</pre>
+
+<p class="Body">would show all entries with a Land field.</p>
+</div>
+
+<div>
+<h2 class="Heading">Formatting</h2>
+
+<p class="Body">Each country has a different way of formatting its addresses,
+so we need a flexible method of specifying address formats.</p>
+
+<p class="Body">What we are going to use here is a table of land names to
+formats, where each format is a single text. For instance:</p>
+<pre class="CodeLast">&gt;&gt;&gt; WRITE format["NL"]
+Name / Dept / Institute / Address / Postcode _ _ City / _
+&gt;&gt;&gt; WRITE format["UK"]
+Name / Dept / Institute / Address / City _ Postcode / UK / _</pre>
+
+<p class="Body">The text is a number of words. A "/" represents a new line, a
+"_" represents a space. Other words are either field names, in which case the
+corresponding entry in the record is substituted, or literal words. Completely
+empty lines are not output, but lines containing spaces are (so the last part
+of the format above ensures a blank line between records). Here's how we output
+a set of records:</p>
+<pre class="CodeLast">HOW TO FORMAT records WITH formats:
+    SHARE field.names, format
+    FOR r IN records:
+        PUT "" IN out
+        FORMAT RECORD
+chosen.format:
+    SELECT:
+        "Land" in keys r AND&nbsp;r["Land"] in keys format:
+            RETURN format[r["Land"]]
+        ELSE:
+            RETURN format["default"]
+FORMAT RECORD:
+    FOR word IN split chosen.format:
+        SELECT:
+            word in field.names:
+                IF word in keys r:
+                    PUT out^r[word] IN out
+            word = "/":
+                IF out &lt;&gt; "": WRITE out/
+                    PUT "" IN out
+            word = "_":
+                PUT out^" " IN out
+            ELSE:
+                PUT out^word IN out
+    IF out &lt;&gt; "": WRITE out/</pre>
+
+<p class="Body">This same code then lets us get an overview of a set of
+entries, just by using another set of formats. For instance:</p>
+<pre class="CodeLast">&gt;&gt;&gt; WRITE brief
+{["default"]: "Name , _ City , _ Land"}
+&gt;&gt;&gt; FORMAT db WITH brief</pre>
+</div>
+
+<div>
+<h2 class="Heading">Changing</h2>
+
+<p class="Body">Just as we had a method of inputting entries, we also need to
+supply a way of changing them. Here we do more or less the same as with input,
+except we display the field name and entry before asking for input. If the user
+types a newline, the entry is unchanged; if the user types other data that then
+replaces the old. We then need a way of deleting an entry: we do this by saying
+that if the user types one or more spaces as input, it has the effect of
+deleting the entry:</p>
+<pre class="CodeLast">HOW TO RETURN modified record:
+    SHARE field.names
+    PUT record IN new
+    FOR field IN field.names:
+        WRITE field, ": "
+        IF field in keys record:
+            WRITE record[field], " "
+        READ answer RAW
+        SELECT:
+            answer = "": PASS
+            stripped answer = "":
+                IF field in keys new:
+                    DELETE new[field]
+            ELSE:
+                PUT answer IN new[field]
+    RETURN new</pre>
+
+<p></p>
+<pre class="CodeLast">HOW TO REPLACE old WITH new IN db:
+    IF old &lt;&gt; new:
+        IF old IN db: REMOVE old FROM db
+        IF new &lt;&gt; {}: INSERT new IN db</pre>
+
+<p class="Body">Note that we could now alter <em class="Code">ADD TO db</em>
+to:</p>
+<pre class="CodeLast">HOW TO ADD TO db:
+    REPLACE {} WITH modified {} IN db</pre>
+
+<p class="Body">which would have the same effect.</p>
+</div>
+
+<div>
+<h2 class="Heading">Putting it all together</h2>
+
+<p class="Body">Now that we've got a number of useful how-tos, we can put them
+together with a driving program. In our final version we had a parser with an
+extensive query language. For now here is a simple version.</p>
+
+<p class="Body">There is a concept of the current selection. Initially the
+selection is the whole database. The selection command has the form "key =
+value" or "key ~ value" for exact or approximate matches (for instance "Land =
+UK"). Subsequent selection commands act on the current selection. The command
+'all' selects the whole database again.</p>
+
+<p class="Body">You use 'show' to show the current selection, 'brief' to
+summarize the current selection, 'format' to format the selection, 'change' to
+modify records in the selection. Finally 'help' gives a help message.</p>
+<pre class="CodeLast">HOW TO DATABASE:
+    SHARE db, field.names
+    PUT db IN selection
+    WRITE #db, "entries"/
+    GET COMMAND
+    WHILE command &lt;&gt; "quit":
+        IF stripped command &lt;&gt; "": OBEY
+        GET COMMAND
+GET COMMAND:
+    WRITE "&gt; "
+    READ command RAW
+    PUT lower command IN command
+OBEY:
+    PUT split command IN words
+    SELECT:
+        command = "new":
+            ADD TO db
+        #words = 3: \Selection command
+            PUT obey.select IN selection
+        command = "all": \Select all
+            PUT db IN selection
+        command = "show":
+            SHOW selection
+        command = "brief":
+            FORMAT selection WITH brief
+        command = "format":
+            FORMAT selection WITH formats
+        command = "change":
+            FOR r IN selection:
+                PUT modified r IN new
+                REPLACE r WITH new IN db
+                REPLACE r WITH new IN selection
+        command = "help": GIVE HELP
+        ELSE:
+            WRITE "Not recognised"/
+            WRITE "Use 'help' for help" /
+obey.select:
+    SELECT:
+        words[1] not.in field.names:
+            WRITE "No such field name" /
+            WRITE "Ignored" /
+            RETURN selection
+        words[2] = "=":
+            PUT selection matches&nbsp;{[words[1]]: words[3]} IN s
+        words[2] = "~":
+            PUT selection contains {[words[1]]: words[3]} IN s
+        ELSE:
+            WRITE "Operator ", words[2]
+            WRITE "unrecognised"/
+            WRITE "Ignored" /
+            RETURN selection
+    SELECT:
+        #s = 0:
+            WRITE "No matches" /
+            WRITE "Ignored" /
+            RETURN selection
+        #s = 1: WRITE "1 entry"/
+        ELSE: WRITE #s, "entries"/
+    RETURN s</pre>
+
+<p class="Body">You could easily add an undo command, by keeping a copy of the
+current selection every time it gets changed. For instance, replace</p>
+<pre class="CodeLast">PUT obey.select IN selection</pre>
+
+<p class="Body">with</p>
+<pre class="CodeLast">PUT selection IN undo
+PUT obey.select IN selection</pre>
+
+<p class="Body">Then the undo command only has to swap the values of the copy
+and the current selection:</p>
+<pre class="CodeLast">PUT undo, selection IN selection, undo</pre>
+
+<p class="Body">Initially, <em class="Code">undo</em> should be empty.</p>
+</div>
+</div>
+
+
+</body></html>

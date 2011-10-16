@@ -1,0 +1,396 @@
+<!--?xml version="1.0" encoding="UTF-8"?-->
+<!--?xml-stylesheet href="#style" type="text/css" media="screen, print" ?-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head>
+  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+  <title>Approximate Numbers</title>
+  <link rel="stylesheet" type="text/css" href="abc.css">
+  <style id="style" type="text/css">
+    body {font-family: sans-serif; }
+    sup {font-size: 80%}
+  </style>
+</head>
+<body bgcolor="#ffffff">
+<h1>Approximate Numbers</h1>
+<p class="author">Steven Pemberton (19870211 updated 20020218).
+</p><p>
+There are two kinds of numbers in ABC:
+exact and approximate.
+Exact numbers are held internally as a fraction of two 
+(unbounded-length) integers, reduced to their lowest common multiple. 
+You can retuen the two numerator and denominator of these fractions with
+ the operators <code>*/</code> and <code>/*</code>. You can convert exact numbers to approximate ones with the operator <code>~</code> and vice versa with <code>round</code>, <code>floor</code> and <code>ceiling</code>.
+</p>
+
+<p> Exact numbers are the result of computations where the result can
+be computed exactly: addition, subtraction, multiplication, division,
+and some exponentiations. However, some operations, such as taking the
+square root, can't deliver an exact result in general, and deliver an
+approximate number instead.  </p>
+
+<p>
+Of course, some exact numbers (like 4), have exact square roots, but if you
+want exact results in these cases you have to write your own function
+to calculate them, something like:
+</p>
+
+<pre class="Code">HOW TO RETURN xroot x:
+   IF exact x:
+      PUT root */x, root /*x IN a, b
+      PUT (round a)/(round b) IN r
+      IF r*r = x: RETURN r
+   RETURN root x</pre>
+
+<p>For approximate numbers,
+the ABC implementations use the hardware representation of floating-point,
+and this is the only place where ABC programs can deliver different results
+on different machines (apart from the workings of the random generator):
+some machines have greater floating-point accuracy than others.
+</p>
+
+<p>
+Machines hold floating-point numbers as an encoding of a pair of numbers
+<em>(f, e)</em>, 
+where <var>f</var>,
+the fraction, has a fixed number of digits to some base <var>b</var>.
+Such a pair then represents the number <var>f</var> × <var>b</var> <sup><var>e</var></sup>.
+</p>
+
+<p>
+To find out how much accuracy your machine has, you can use the following
+command (adapted from a routine by Malcolm (reference 1))
+to find the base and number of significant digits used on your machine:</p>
+
+<pre class="Code">HOW TO PRINT ACCURACY:
+    PRINT BASE
+    PRINT FRACTION
+PRINT BASE:
+    PUT ~2, ~2, ~0 IN a, b, base
+    WHILE a+1-a-1 = ~0: PUT a+a IN a
+    WHILE base = ~0: PUT a+b-a, b+b IN base, b
+    WRITE "Base =", base /
+PRINT FRACTION:
+    PUT 1, base IN sig, b
+    WHILE b+1-b-1 = ~0: PUT sig+1, b*base IN sig, b
+    WRITE "Significant digits =", sig /
+    WRITE "This is about `decimal` decimal digits" /
+decimal:
+    RETURN 1 round (sig/(base log 10))</pre>
+
+<p>It works by first looking for a whole number that doesn't
+produce a different number when you add 1 to it.
+For instance, suppose the representation we are examining has 4 digits to
+base 10.
+Then you can add 1 to all 4 digit numbers, but not to 5 digit numbers, so
+it will try in turn 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048,
+4096, and 8192.
+Finally it will try 16384,
+which is only representable as 1638 × 10 <sup>1</sup>, which is 16380.
+</p>
+
+<p>
+The routine then searches for a number that can be added to it
+which does produce a different number.
+Exactly which number it finds depends on whether the machine rounds the
+last digit of a calculation, or just chops excess digits off.
+So it tries to add 2, 4, and 8.
+If the machine rounds then 16380 + 8 = 16388, which rounded to 4 places is
+16390.
+However, if the machine chops, then 16388 chopped is 16380, so then it tries
+to add 16,
+which gives 16396, and chopped this gives 16390, so in either case we get
+the same result from the two types of machine.
+</p>
+
+<p>
+Now subtracting these two values, 16390 - 16380, gives the base used,
+in this case 10.
+</p>
+
+<p>
+Having found the base, the routine then goes on to find the number of
+significant digits by repeatedly multiplying by the base until again 1
+cannot be added.
+In our case, it will try 1, 10, 100, 1000, and finally 10000 to which 1
+cannot be added.
+From the number of times that the multiplication is done, the  number of
+significant digits can be deduced.
+</p>
+
+<p>
+Here is an example of its output, for a VAX:</p>
+
+<pre class="Code">&gt;&gt;&gt; PRINT ACCURACY
+<em>Base = 2
+Significant digits = 56
+This is about 16.9 decimal digits</em></pre>
+
+<h2>The Consequences of Approximate Numbers</h2>
+
+<p>
+The advantage of using approximate numbers in ABC is that for large numbers
+they are generally faster to calculate than the equivalent exact numbers.
+The big disadvantage is of course that your results are only approximately
+correct. But how approximate is that?
+</p>
+
+<p>
+To give an example, consider the value
+1/((sqrt x) - (sqrt (x-1))).
+This is the same as (sqrt x) + (sqrt (x-1))
+(you just multiply all through by
+((sqrt x) + (sqrt (x-1))) / ((sqrt x) + (sqrt (x-1)))).
+</p>
+
+<p>
+However, if you calculate these using approximate numbers, you will get
+different results.
+For instance:</p>
+
+<pre class="Code">HOW TO COMPARE VALUES FOR x:
+    PUT root x, root (x-1) IN r, r1
+    PUT 1/(r-r1), r+r1 IN u, v
+    WRITE "1/((root x)-(root (x-1)))=", u /
+    WRITE "(root x)+(root (x-1))=    ", v /
+    WRITE "Difference =", u-v /</pre>
+<p></p>
+
+<pre class="Code">&gt;&gt;&gt; COMPARE VALUES FOR 10**12
+<em>1/((root x)-(root (x-1)))= 2000042.97959778
+(root x)+(root (x-1))=     1999999.9999995
+Difference = 42.9795982764044</em>
+&gt;&gt;&gt; COMPARE VALUES FOR 10**15
+<em>1/((root x)-(root (x-1)))= 63161283.7647059
+(root x)+(root (x-1))=     63245553.2033676
+Difference = -84269.4386616889</em></pre>
+
+<p>This is on a machine with nearly 17 decimal digits of accuracy, and 
+yet the two results differ already in the third digit in the second 
+example!
+The explanation for this is that if you subtract two very close numbers,
+ you
+lose a lot of accuracy.
+Try doing it for <var>x</var> = 256 with 4 digits of accuracy:
+root 256 = 16.00, and root 255 = 15.97.
+Subtracting these two gives 0.03, leaving only one digit of accuracy where
+before you had four.
+The inverse of this is 33.33,
+while the sum of the two is 31.97, a very different value
+(and as close as you can get to the real value with 4 digits).
+</p>
+
+<p>
+So the question arises,
+in a given program,
+how can you tell how close a result is to the
+<em>real</em> answer?
+The rest of this article presents a package to help answer this question.
+
+</p><h2>Range Arithmetic</h2>
+
+
+<p>
+This package simulates approximate arithmetic, and keeps for each
+arithmetic value an upper and lower bound on its real value.
+For instance, using 4 digits,
+<var>pi</var>
+lies between 3.141 and 3.142.
+</p>
+
+<p>
+Then for each operation, it calculates the upper and lower bounds of the
+result.
+For instance, when adding two values (<var>l</var> , <var>u</var>) and (<var>l'</var> , <var>u'</var>),
+the result is
+ (rounded.down(<var>l</var> + <var>l'</var>), rounded.up(<var>u</var> + <var>u'</var>)).
+For
+<var>pi</var> + <var>pi</var>,
+this would give (6.282, 6.284).
+In ABC:</p>
+
+<pre class="Code">HOW TO RETURN a plus b:
+    PUT a, b IN (la, ua), (lb, ub)
+    RETURN down (la + lb), up (ua + ub)</pre>
+
+<p>or shorter yet:</p>
+
+<pre class="Code">HOW TO RETURN (la, ua) plus (lb, ub)
+    RETURN down (la + lb), up (ua + ub)</pre>
+
+<p></p>
+
+<p>
+Since we want to simulate approximate arithmetic using a fixed number of
+digits of accuracy, the functions <code>up</code> and <code>down</code> take a number
+and remove excess digits, rounding either up or down.
+The contents of the shared location <code>accuracy</code> specify
+how many digits of accuracy we are interested in:</p>
+
+<pre class="Code">HOW TO RETURN up x:
+    SHARE accuracy
+    IF x=0: RETURN 0
+    PUT 0, 10**accuracy IN shift, limit
+    WHILE abs x &lt; limit: PUT x*10, shift - 1 IN x, shift
+    WHILE abs x &gt; limit: PUT x/10, shift + 1 IN x, shift
+    RETURN (ceiling x) * 10**shift</pre>
+
+<p>This takes a number like 3.14159265,
+and multiplies or divides it so that its integral part has <code>accuracy</code>
+digits, also calculating the number of digits it has been shifted.
+So for <code>accuracy = 4</code>, <code>x</code> ends up as <code>3141.59265</code>, with <code>shift = -3</code>.
+It then applies <code>ceiling</code>, which gives 3142, and
+multiplies this by 10 <sup>-3</sup> to shift it back to give 3.142.
+</p>
+
+<p>
+The function to round down is the same, except it uses <code>floor</code> instead of
+<code>ceiling</code>.</p>
+
+<pre class="Code">&gt;&gt;&gt; PUT 4 IN accuracy
+&gt;&gt;&gt; WRITE down pi, up pi
+<em>3.141 3.142</em>
+&gt;&gt;&gt; WRITE down 123, up 123
+<em>123 123</em>
+&gt;&gt;&gt; WRITE down 12345, up 12345
+<em>12340 12350</em></pre>
+
+<p></p>
+
+<p>
+Because exact arithmetic is being used, any value for <code>accuracy</code> can be
+used.
+Calculating to 100 places will only take more time.
+</p>
+
+<p>
+Subtraction is similar to addition:</p>
+
+<pre class="Code">HOW TO RETURN (la, ua) minus (lb, ub):
+    RETURN down (la-ub), up (ua-lb)</pre>
+
+<p>Multiplication is slightly harder, mainly because of problems caused when
+multiplying values whose upper and lower bounds have different signs.
+Here we take the easy way out, and calculate all possible
+values and identify the maximum and minimum:</p>
+
+<pre class="Code">HOW TO RETURN (la, ua) times (lb, ub):
+    RETURN minmax {la*lb; la*ub; ua*lb; ua*ub}</pre>
+
+<p>where <code>minmax</code> returns the minimum and maximum values from a list:</p>
+
+<pre class="Code">HOW TO RETURN minmax list: RETURN down min list, up max list</pre>
+
+<p>We can do the same for division, but additionally we have to check
+for division by zero:</p>
+
+<pre class="Code">HOW TO RETURN (la, ua) over (lb, ub):
+    CHECK NOT (lb &lt;= 0 &lt;= ub) \Division by zero
+    RETURN minmax {la/lb; la/ub; ua/lb; ua/ub}</pre>
+
+<p>To use the package, a method is needed for converting an ABC number
+like <code>pi</code> into a range:</p>
+
+<pre class="Code">HOW TO RETURN range v: RETURN down v, up v</pre>
+
+<p>Just to show it works:</p>
+
+<pre class="Code">&gt;&gt;&gt; WRITE range pi
+<em>3.141 3.142</em>
+&gt;&gt;&gt; WRITE range 123
+<em>123 123</em>
+&gt;&gt;&gt; WRITE range 12345
+<em>12340 12350</em></pre>
+
+<p>Also useful is a way of printing ranges more visibly as ranges:</p>
+
+<pre class="Code">HOW TO RETURN bounds (l, u): RETURN "[`l`:`u`] "</pre>
+<p></p>
+
+<pre class="Code">&gt;&gt;&gt; WRITE bounds range pi
+<em>[3.141:3.142]</em>
+&gt;&gt;&gt; WRITE bounds range 123
+<em>[123:123]</em></pre>
+
+<p>Now finally to define a function for square root.
+This uses the Newton-Raphson method,
+which repeatedly calculates for argument <var>a</var>,
+r = half ( { a ÷ r } + r ), until two consecutive <var>r</var>'s are sufficiently
+close:</p>
+
+<pre class="Code">HOW TO RETURN sq.root (l, u):
+    RETURN down sq.root' l, up sq.root' u</pre>
+<p></p>
+
+<pre class="Code">HOW TO RETURN sq.root' f:
+    IF f=0: RETURN 0
+    PUT f, (f+1)/2 IN r, r'
+    WHILE converging: PUT r', (f/r' + r') / 2 IN r, r'
+    RETURN r
+converging:
+    REPORT down r &lt;&gt; down r'</pre>
+
+<p>The definition of closeness is whether the two approximations
+differ only in digits outside the accuracy we are interested in.</p>
+
+<pre class="Code">&gt;&gt;&gt; WRITE bounds sq.root range 256
+<em>[16:16.01]</em>
+&gt;&gt;&gt; WRITE bounds sq.root range 2
+<em>[1.414:1.415]</em></pre>
+
+<p>(Actually <code>sq.root'</code> can be speeded up by adding at the beginning</p>
+
+<pre class="Code">SHARE accuracy
+PUT accuracy+1 IN accuracy</pre>
+
+<p>and replacing <code>(f/r' + r') / 2</code> by <code>up((f/r' + r') / 2)</code>.
+In that way, intermediate calculations don't get calculated with too great
+an accuracy.)
+</p>
+
+<p>
+Now, finally back to our original problem:</p>
+
+<pre class="Code">&gt;&gt;&gt; PUT range 1 IN one
+&gt;&gt;&gt; PUT sq.root range 256 IN r256
+&gt;&gt;&gt; PUT sq.root range 255 IN r255
+&gt;&gt;&gt; WRITE bounds (r256 plus r255)
+<em>[31.96:31.98]</em>
+&gt;&gt;&gt; WRITE bounds (one over (r256 minus r255))
+<em>[20:33.34]</em></pre>
+
+<p>This makes it quite clear which of the two results is more accurate.
+</p>
+
+<p>
+This last result is both shocking and sobering.
+But if you work it out,
+root 256 is [16:16.01] and root 255 is [15.96:15.97].
+The difference of these two is [0.03:0.05], so obviously the inverse is
+[20:33.34].
+</p>
+
+<p>
+Even if we use <code>range 16</code> instead of <code>r256</code>, we still get a wide range:</p>
+
+<pre class="Code">&gt;&gt;&gt; WRITE bounds (one over((range 16) minus r255))
+<em>[25:33.34]</em></pre>
+
+<p>For more information about range arithmetic, see reference 2.
+
+</p><h2>References</h2>
+
+<p>
+1. M. A. Malcolm,
+<em>Algorithms to reveal properties of floating-point arithmetic</em>,
+Communications of the ACM, Volume 15, Number 11, November 1972.
+</p>
+
+<p>
+2. D. E. Knuth,
+<em>The Art of Computer Programming</em>,
+Volume 2, Seminumerical Algorithms,
+Addison-Wesley, Reading, Mass., 1973.
+
+
+
+</p></body></html>
