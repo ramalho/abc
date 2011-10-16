@@ -12,6 +12,13 @@ Pemberton's homepage at CWI [2], accessed in October 2011.
 
 [2] http://homepages.cwi.nl/~steven/abc/
 
+The CWI FTP server mentioned in some links cannot be found (as of Oct. 2011), but
+some of the papers mentioned can be found via OAI-PMH at the CWI OAI server [3],
+or via CiteSeerX [4].
+
+[3] http://oai.cwi.nl/oai
+[4] http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.100.3565
+
 ##############################################################
 ABC Programmer's Handbook
 
