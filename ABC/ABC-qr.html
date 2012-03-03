@@ -1,0 +1,348 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<HTML xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+  <title>ABC Quick Reference</title>
+  <link rel="stylesheet" type="text/css" href="steven.css" />
+  <style type="text/css"><!--
+     h1, h2, h3, h4, h5, h6 {font-family: sans-serif; margin-left: -1cm; }
+     body {margin-left: 1cm}
+     a:hover {color: red}
+  --></style>
+</head>
+<body bgcolor="yellow">
+<h1>ABC Quick Reference</h1>
+
+<ul>
+<li> <a href="#COMMANDS">COMMANDS</A>
+
+<li> <a href="#HOWTOs">HOW-TO's (= Procedures and functions)</a>
+<ul>
+<li> <a href="#Refinements">Refinements (after the commands of a how-to)</a>
+
+<li> <a href="#Terminating">Terminating commands</a>
+</ul>
+<li> <a href="#EXPRESSIONS">EXPRESSIONS AND ADDRESSES</a>
+
+<li> <a href="#TESTS">TESTS</a>
+
+<li> <a href="#PREDEFINED">PREDEFINED FUNCTIONS AND PREDICATES</a>
+<ul>
+<li> <a href="#numbers">Functions and predicates on numbers</a>
+
+<li> <a href="#texts">Functions on texts</a>
+
+<li> <a href="#tables">Function on tables</a>
+
+<li> <a href="#trains">Functions and predicates on trains</a>
+
+<li> <a href="#all">Functions on all types</a>
+</ul>
+<li> <a href="#CHARACTERS">THE CHARACTERS</a>
+</ul>
+
+<a name="COMMANDS"><H2>COMMANDS</H2>
+
+<dl>
+<dt><tt> 	  WRITE	expr</tt></dt>
+<dd>  			Write to screen;
+					/ before or after expr gives new line
+<dt><tt>	  READ address EG expr</tt></dt>
+<dd> 		Read expression	from terminal to address; expr is example</dd>
+<dt><tt>  READ address RAW</tt></dt>
+<dd>		Read line of text</dd>
+<dt><tt>  PUT expr IN address</tt></dt>
+<dd>		Put value of expr in address</dd>
+<dt><tt>  SET RANDOM expr</tt></dt>
+<dd>		Start random sequence for random and choice</dd>
+<dt><tt>  REMOVE expr FROM list</tt></dt>
+<dd>		Remove one element from	list</dd>
+<dt><tt>  INSERT expr IN list</tt></dt>
+<dd>		Insert in right	place</dd>
+<dt><tt>  DELETE address</tt></dt>
+<dd>		Delete permanent location or table entry</dd>
+<dt><tt>  PASS</tt></dt>
+<dd>				Do nothing</dd>
+<dt><tt>  KEYWORD expr KEYWORD ...</tt></dt>
+<dd>	Execute	user-defined command</dd>
+<dt><tt>  KEYWORD</tt></dt>
+<dd>			Execute	refined	command
+<br /></dd>
+<dt><tt>  CHECK test</tt></dt>
+<dd>			Check test and stop if it fails</dd>
+<dt><tt>  IF test: <br /> &nbsp;&nbsp;&nbsp;commands</tt></dt>
+<dd>			If test	succeeds, execute commands;
+			    no ELSE allowed</dd>
+<dt><tt>	  SELECT: <br />
+&nbsp;&nbsp;&nbsp;test: commands <br />
+&nbsp;&nbsp;&nbsp;...			 <br />     
+&nbsp;&nbsp;&nbsp;test: commands		 <br />     </tt></dt>
+<dd>			Select one alternative:
+try each test in order (one must succeed; the last test may be ELSE)</dd>
+<dt><tt>	  WHILE	test:  <br />
+&nbsp;&nbsp;&nbsp; commands</tt></dt>
+<dd>	As long	as test	succeeds execute commands</dd>
+<dt><tt>	  FOR name,... IN train:  <br />
+&nbsp;&nbsp;&nbsp;commands</tt></dt>
+<dd>	Take each element of train in turn</dd>
+</dl>
+</a>
+
+<a name="HOWTOs"><H2>HOW-TO's</H2>
+<dl>
+<dt><tt>	  HOW TO KEYWORD ...: 	     commands</tt></dt>
+<dd>		Define new command KEYWORD ...
+</dd>
+<dt><tt>	  HOW TO RETURN f: commands</tt></dt>
+<dd>		Define new function f with no arguments (returns a value)
+</dd>
+<dt><tt>	  HOW TO RETURN f x:	     commands</tt></dt>
+<dd>		Define new function f with one argument
+</dd>
+<dt><tt>	  HOW TO RETURN x f y: 	     commands</tt></dt>
+<dd>		Define new function f with two arguments
+</dd>
+<dt><tt>	  HOW TO REPORT pr: commands</tt></dt>
+<dd>		Define new predicate pr	with no	arguments (succeeds/fails)
+</dd>
+<dt><tt>	  HOW TO REPORT pr x: 	     commands</tt></dt>
+<dd>		Define new predicate pr	with one argument
+</dd>
+<dt><tt>	  HOW TO REPORT x pr y: 	     commands</tt></dt>
+<dd>		Define new predicate pr	with two arguments
+<br />
+</dd>
+<dt><tt>	  SHARE name,...</tt></dt>
+<dd>		Share permanent	locations (before	commands of how-to)
+</dd>
+</dl>
+</a>
+<a name="Refinements"><H3>Refinements (after the commands of a how-to)</H3>
+
+<dl>
+<dt><tt>	  KEYWORD: commands</tt></dt>
+<dd>		Define command refinement</dd>
+<dt><tt>	  name: commands</tt></dt>
+<dd>		Define expression- or test-refinement
+
+</dl>
+</a>
+<a name="Terminating"><H3>Terminating commands</H3>
+
+<dl></dd>
+<dt><tt>	  QUIT</tt></dt>
+<dd>				Leave command how-to or	command	refinement, or leave ABC</dd>
+<dt><tt>	  RETURN expr</tt></dt>
+<dd>			Leave function how-to or expression refinement, return value of expr</dd>
+<dt><tt>	  REPORT test</tt></dt>
+<dd>			Leave predicate	how-to or test-refinement, report outcome of test</dd>
+<dt><tt>	  SUCCEED</tt></dt>
+<dd>			The same, report success</dd>
+<dt><tt>	  FAIL</tt></dt>
+<dd>				The same, report failure
+</dd>
+
+</dl>
+</a>
+
+<a name="EXPRESSIONS"><H2>EXPRESSIONS AND ADDRESSES</H2>
+<dl>
+<dt><tt>	  666, 3.14, 3.14e-9</tt></dt>
+<dd>		Exact constants
+</dd>
+<dt><tt>	  expr,expr,...</tt></dt>
+<dd>			Compound</dd>
+<dt><tt>	  name,name,...</tt></dt>
+<dd>			Naming (may also be used as address)
+</dd>
+<dt><tt>	  text@p</tt></dt>
+<dd>			"ABCD"@2 = "BCD" (also address)</dd>
+<dt><tt>	  text|q</tt></dt>
+<dd>			"ABCD"|3 = "ABC" (also address)</dd>
+<dt><tt>	  text@p|q</tt></dt>
+<dd>			"ABCD"@2|1 = "BCD"|1 = "B"
+</dd>
+<dt><tt>	  table[expr]</tt></dt>
+<dd>			Table selection	(also address)
+</dd>
+<dt><tt>	  "Jan", 'Feb', 'Won''t!'</tt></dt>
+<dd>		Textual	displays (empty: "" or '')</dd>
+<dt><tt>	  "value = `expr`;"</tt></dt>
+<dd>		Conversion of expr to text
+</dd>
+<dt><tt>	  {1; 2; 2; ...}</tt></dt>
+<dd>		List display (empty: {})</dd>
+<dt><tt>	  {1..9; ...}, {"a".."z"; ...}</tt></dt>
+<dd>	List of	consecutive values
+</dd>
+<dt><tt>	  {["Jan"]: 1; ["Feb"]: 2; ...}</tt></dt>
+<dd>	Table display (empty: {})
+</dd>
+<dt><tt>	  f, f x, x f y</tt></dt>
+<dd>			Result of function f (no permanent effects)</dd>
+<dt><tt>	  name</tt></dt>
+<dd>				Result of refinement (no permanent effects)
+</dd>
+</dl>
+</a>
+
+<a name="TESTS"><H2>TESTS</H2>
+<dl>
+<dt><tt>	  x &lt; y, x &lt;= y, x &gt;= y, x &gt; y,  x = y, x &lt;&gt; y, 0 &lt;= d &lt; 10</tt></dt>
+<dd>	Order tests (&lt;&gt; means 'not equals')
+</dd>
+<dt><tt>	  pr, pr x, x pr y</tt></dt>
+<dd>		Outcome	of predicate pr	(no permanent effects)</dd>
+<dt><tt>	  name</tt></dt>
+<dd>				Outcome	of refinement (no permanent effects)
+</dd>
+<dt><tt>	  test AND test AND ...</tt></dt>
+<dd>		Fails as soon as one of	the tests fails</dd>
+<dt><tt>	  test OR test OR ...</tt></dt>
+<dd>		Succeeds as soon as one	of the tests succeeds</dd>
+<dt><tt>	  NOT test
+
+
+<dt>	  SOME name,... IN train HAS test
+</tt></dt>
+<dd>					Sets name, ... on success</dd>
+<dt><tt>	  EACH name,... IN train HAS test
+</tt></dt>
+<dd>					Sets name, ... on failure</dd>
+<dt><tt>	  NO   name,... IN train HAS test
+</tt></dt>
+<dd>					Sets name, ... on failure
+</dd>
+
+</dl>
+</a>
+
+<a name="PREDEFINED">
+<H2>PREDEFINED FUNCTIONS AND PREDICATES</H2>
+<a name="numbers"><H3>Functions and predicates on numbers</H3>
+<dl>
+<dt><tt>	  ~x</tt></dt>
+<dd>				Approximate value of x</dd>
+<dt><tt>	  exactly x</tt></dt>
+<dd>			Exact value of x</dd>
+<dt><tt>	  exact x</tt></dt>
+<dd>			Test if	x is exact</dd>
+<dt><tt>	  +x, x+y, x-y, -x, x*y, x/y</tt></dt>
+<dd>	Plain arithmetic</dd>
+<dt><tt>	  x**y</tt></dt>
+<dd>				x raised to the	power y</dd>
+<dt><tt>	  root x, n root x</tt></dt>
+<dd>		Square root, n-th root</dd>
+<dt><tt>	  abs x, sign x</tt></dt>
+<dd>			Absolute value,	sign (=	-1, 0, or +1)</dd>
+<dt><tt>	  round x, floor x, ceiling x</tt></dt>
+<dd>	Rounded	to whole number</dd>
+<dt><tt>	  n round x</tt></dt>
+<dd>			x rounded to n digits after decimal point</dd>
+<dt><tt>	  a mod n</tt></dt>
+<dd>			Remainder of a on division by n</dd>
+<dt><tt>	  */x</tt></dt>
+<dd>				Numerator of exact number x</dd>
+<dt><tt>	  /*x</tt></dt>
+<dd>				Denominator</dd>
+<dt><tt>	  random</tt></dt>
+<dd>			Random approximate number r, 0 &lt;= r &lt; 1</dd>
+<dt><tt>	  e, exp x</tt></dt>
+<dd>			Base of	natural	logarithm, exponential function</dd>
+<dt><tt>	  log x, b log x</tt></dt>
+<dd>		Natural	logarithm, logarithm to	the base b</dd>
+<dt><tt>	  pi, sin x, cos x, tan x, arctan x
+</tt></dt>
+<dd>					Trigonometric functions, with x	in radians</dd>
+<dt><tt>	  angle (x, y), radius (x, y)</tt></dt>
+<dd>	Angle of and radius to point (x, y)</dd>
+<dt><tt>	  c sin x, c cos x, c tan x</tt></dt>
+<dd>	Similar, with the circle divided into c	parts</dd>
+<dt><tt>	  c arctan x, c angle (x, y)</tt></dt>
+<dd>	    (e.g. 360 for degrees)</dd>
+<dt><tt>	  now</tt></dt>
+<dd>				e.g. (1999, 12,	31, 23,	59, 59.999)
+</dd>
+
+</dl>
+</a>
+<a name="texts"><H3>Functions on texts</H3>
+<dl>
+
+<dt><tt>	  t^u</tt></dt>
+<dd>				t and u	joined into one	text</dd>
+<dt><tt>	  t^^n</tt></dt>
+<dd>				t repeated n times</dd>
+<dt><tt>	  lower t</tt></dt>
+<dd>			lower "aBc" = "abc"</dd>
+<dt><tt>	  upper t</tt></dt>
+<dd>			upper "aBc" = "ABC"</dd>
+<dt><tt>	  stripped t</tt></dt>
+<dd>			Strip leading and trailing spaces from t</dd>
+<dt><tt>	  split t</tt></dt>
+<dd>			Split text t into words
+</dd>
+
+</dl>
+</a>
+<a name="tables"><H3>Function on tables</H3>
+<dl>
+
+<dt><tt>	  keys table</tt></dt>
+<dd>			List of	all keys in table
+
+</dl>
+</a>
+<a name="trains"><H3>Functions and predicates on trains</H3>
+<dl>
+</dd>
+<dt><tt>	  #train</tt></dt>
+<dd>			Number of elements in train</dd>
+<dt><tt>	  e#train</tt></dt>
+<dd>			Number of elements equal to e</dd>
+<dt><tt>	  e in train, e not.in train</tt></dt>
+<dd>	Test for presence or absence</dd>
+<dt><tt>	  min train</tt></dt>
+<dd>			Smallest element of train</dd>
+<dt><tt>	  e min train</tt></dt>
+<dd>			Smallest element larger	than e</dd>
+<dt><tt>	  max train, e max train</tt></dt>
+<dd>	Largest	element</dd>
+<dt><tt>	  train item n</tt></dt>
+<dd>			n-th element</dd>
+<dt><tt>	  choice train</tt></dt>
+<dd>			Random element
+</dd>
+
+</dl>
+</a>
+<a name="all"><H3>Functions on all types</H3>
+<dl>
+<dt><tt>	  x&lt;&lt;n</tt></dt>
+<dd>				x converted to text, aligned left in width n</dd>
+<dt><tt>	  x&gt;&lt;n</tt></dt>
+<dd>				The same, centred</dd>
+<dt><tt>	  x&gt;&gt;n</tt></dt>
+<dd>				The same, aligned </dd>
+
+</dl>
+</a></a>
+
+<a name="CHARACTERS"><H2>THE CHARACTERS</H2>
+<dl>
+
+This is the order of all characters that may occur in a text. (The
+first is a space.)
+
+<pre>
+&nbsp;!"#$%&'()*+,-./		
+0123456789:;&lt;=&gt;?
+@ABCDEFGHIJKLMNO		
+PQRSTUVWXYZ[\]^_
+`abcdefghijklmno
+pqrstuvwxyz{|}~
+</pre>
+</a>
+</body>
+</html>

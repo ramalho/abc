@@ -1,0 +1,553 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>ABC Online Manual</title>
+  <meta http-equiv="Content-Type" content="text/html">
+  <style type="text/css"><!--
+     body {margin-left: 1cm;}
+     h1,h2 {margin-left: -1cm; }
+     h1, h2, h3, h4, h5, h6 {font-family: sans-serif; }
+     a:hover {color: red}
+  --></style>
+</head>
+
+<body>
+<h2>Using ABC</h2>
+abc - ABC interpreter &amp; environment <br>
+abckeys - change key bindings for 'abc'
+
+<h2>Synopsis</h2>
+<strong>abc</strong> [ <strong>-g</strong> dir ] [ <strong>-w</strong> name ]
+[ <strong>-c</strong> name ] [ <strong>-e</strong>] [ file ... ] <br>
+<strong>abc</strong> [ <strong>-g</strong> dir ] [ <strong>-w</strong> name ]
+<strong>-i</strong> tab | <strong>-o</strong> tab <br>
+<strong>abc</strong> [ <strong>-g</strong> dir ] [ <strong>-w</strong> name ]
+<strong>-l</strong> | <strong>-p</strong> | <strong>-u</strong> [file ... ]
+<br>
+<strong>abc</strong> [ <strong>-g</strong> dir ] [ <strong>-w</strong> name ]
+<strong>-r</strong> | <strong>-x</strong> <br>
+<strong>abckeys</strong>
+
+<h2>Description</h2>
+
+<p>Without options or files, the ABC interpreter is started, using the ABC
+editor, in the last workspace used or in workspace '<em>first</em>' if this is
+your first abc session. A workspace is kept as a group of files in a
+directory, with separate files for each how-to and location. The workspace
+directories themselves are kept by default in the directory $HOME/abc. On
+Windows, $HOME is the folder <em>My Documents</em>.</p>
+
+<h3>Workspace Options</h3>
+<dl>
+  <dt><strong>-g</strong>  dir</dt>
+    <dd>use group of workspaces in 'dir' instead of $HOME/abc.</dd>
+  <dt><strong>-w</strong>  name</dt>
+    <dd>start in workspace 'name' instead of last workspace used.</dd>
+  <dt><strong>-w</strong>  path</dt>
+    <dd>use 'path' as workspace (no -g option allowed).</dd>
+  <dt><strong>-c</strong>  name</dt>
+    <dd>use 'name' as central workspace (default: $HOME/abc/abc).</dd>
+  <dt><strong>-c</strong>  path</dt>
+    <dd>use 'path' as central workspace.</dd>
+</dl>
+
+<h3>Run Options</h3>
+<dl>
+  <dt><strong>-e</strong></dt>
+    <dd>Use $EDITOR as editor to edit definitions, instead of ABC editor.</dd>
+  <dt>file ...</dt>
+    <dd>Read commands from file(s) instead of from standard input; input for
+      <tt>READ</tt> commands is taken from standard input. If a file is called
+      '-' and standard input is the keyboard, the ABC system is started up
+      interactively for that entry.</dd>
+</dl>
+
+<h3>Special tasks - table handling</h3>
+<dl>
+  <dt><strong>-i</strong>  tab</dt>
+    <dd>Fill table 'tab' with text lines from standard input.</dd>
+  <dt><strong>-o</strong>  tab</dt>
+    <dd>Write text lines from table 'tab' to standard output.</dd>
+</dl>
+
+<h3>Special tasks - workspace handling</h3>
+<dl>
+  <dt><strong>-l</strong> (Letter L)</dt>
+    <dd>List the how-to's in workspace to standard output.</dd>
+  <dt><strong>-p</strong></dt>
+    <dd>Pack how-to's and locations from a workspace to standard output.</dd>
+  <dt><strong>-u</strong>  [ file ... ]</dt>
+    <dd>Unpack how-to's and locations from file(s) or standard input in
+      workspace.</dd>
+</dl>
+
+<h3>Special tasks - recovering</h3>
+<dl>
+  <dt><strong>-r</strong></dt>
+    <dd>Recover a workspace when its index is lost: useful after a machine
+      crash if the ABC internal administration files didn't get written
+    out.</dd>
+  <dt><strong>-x</strong></dt>
+    <dd>Recover the index of a group of workspaces.</dd>
+</dl>
+
+<h2>Usage</h2>
+
+<p><em>(This is necessarily a very brief description; see 'The ABC
+Programmer's Handbook' for full details.)</em></p>
+
+<p>When ABC starts up interactively, it displays a prompt and awaits
+input.</p>
+
+<p>Use '<tt>QUIT</tt>' to finish an ABC session.</p>
+
+<h3>Typing and Suggestions</h3>
+As you type, the system tries to suggest a possible continuation for what you
+have typed; to accept the suggestion, press [accept] (by default this is bound
+to the <code>[tab]</code> key; type '<tt>?</tt>' to find out the bindings for
+the keyboard you are using). If you don't want to accept the suggestion, just
+carry on typing (you can always type character for character, ignoring the
+suggestions). Usually the system knows where a letter must be capital and
+where not, and you usually don't have to use the shift key; however, in the
+few places where both a lower-case and an upper-case letter would be legal
+(for instance for <tt>AND</tt>), you have to type the letter upper-case. 
+
+<p>When you type a control command, like <tt>WHILE</tt>, the system provides
+indentation automatically for the body of the command; to reduce the
+indentation one level, type [return].</p>
+
+<h3>Correcting and Editing</h3>
+The [undo] key (by default bound to <code>[backspace]</code>) undoes the last
+key you typed. Repeatedly typing it undoes more and more, up to a certain
+maximum number of key-presses. 
+
+<p>To correct other parts, you must put the 'focus' onto the part you want to
+change. The focus is displayed by underlining or reverse video. [Widen] and
+[extend] make the focus larger, [first] and [last] make it smaller.</p>
+
+<p>[Delete] deletes the contents of the focus.</p>
+
+<p>[Copy] copies the contents of the focus to a buffer, or if the focus is not
+focussed on anything, copies the contents of the buffer back to where you are
+positioned.</p>
+
+<h3>Moving the Focus</h3>
+[Upline] and [downline] focus on one line above or below. [Previous] and
+[next] move the focus left and right. [Up], [down], [left], and [right] move
+an empty focus around. [Goto] widens the focus to the largest thing at the
+current cursor position. [Mouse] moves the focus to the largest thing at the
+position of a mouse-click. 
+
+<h3>Other Operations</h3>
+[look] redraws the screen; [record] records all keystrokes until the next time
+you press [record] -- [play] replays them. [Redo] redoes the last key(s)
+undone; [interrupt] interrupts a running command. 
+
+<h3>Workspaces</h3>
+To create a new workspace, or go to an existing workspace, type
+'<tt>&gt;name</tt>'. To go to the last workspace you were in, type a single
+'<tt>&gt;</tt>'. To get a list of workspace names, type '<tt>&gt;&gt;</tt>'. 
+
+<p>How-to's in the central workspace can be invoked in any other workspace.
+Shared locations used in central how-to's access locations in the current
+workspace, however. The default central workspace is $HOME/abc/abc; it can be
+changed with the '<strong>-c</strong> name' option. To edit how-to's in the
+central workspace, you must go to it.</p>
+
+<h3>How-to's</h3>
+To create a new how-to, just type the first line of the how-to. This creates
+the new how-to, and allows you to type the body. Use [exit] to finish it (by
+default <code>[esc][esc]</code>). 
+
+<p>To visit a how-to, type a colon, followed by the name of the how-to. Again,
+use [exit] to exit. To visit the last how-to again, or the last how-to you got
+an error message for, type a single '<tt>:</tt>'. To get a list of the
+how-to's in this workspace, type '<tt>::</tt>'.</p>
+
+<p>To edit a location, type a '<tt>=</tt>' followed by the name of the
+location. To re-edit it, type a single '<tt>=</tt>'. To get a list of the
+locations in the workspace, type '<tt>==</tt>'.</p>
+
+<h2>Key Bindings</h2>
+The binding of editing operations like [accept] to keys may be different for
+your keyboard; type a '<tt>?</tt>' at the prompt to find out what the bindings
+are for your keyboard. <br>
+To redefine the keys used for editor operations, run 'abckeys'. This produces
+a private key definitions file. You will be given instructions on how to use
+it. <br>
+Keys labeled f1...f8 are <em>function</em> keys. On Unix, the way to type
+these is terminal-dependent. The codes they send must be defined by the
+termcap entry for your terminal. <br>
+If a terminal has arrow keys which transmit codes to the computer, these are
+used for Up, Down, Left and Right. Again, the termcap entry must define the
+codes. See termcap (5).
+
+<h2>Mouse and Goto</h2>
+The [mouse] operation can be used to move the focus using your mouse. For
+simple cases, the program 'abckeys' is smart enough to work out the behaviour
+of your mouse, and add suitable definitions to your key definitions file. If
+it fails you must add some extra definitions yourself: apart from [mouse] you
+should define [mouse-format] and possibly [mouse-sense] in your key
+definitions file, according to which of the following schemes applies: 1) a
+mouse-click sends a sequence of characters that includes the position
+information, or 2) a mouse-click sends a fixed sequence, and the terminal must
+then be asked where the click occurred. <br>
+For 1) [mouse] must be bound to the initial sequence that the mouse click
+sends, [mouse-sense] should be empty, and [mouse-format] should describe the
+rest of the sequence. <br>
+For 2) [mouse] should be set to the fixed sequence the mouse click sends,
+[mouse-sense] to the string that should be sent to the terminal to ask for the
+click position, and [mouse-format] to the format that describes the reply. 
+
+<p>The [goto] operation is of most use if the cursor can be moved locally at
+the terminal, and the terminal can then be sensed for the cursor position. You
+must define two extra operations for this in your key definitions file:
+[cursor-sense] which gives the string that must be sent to the terminal to
+sense the cursor position, and [cursor-format] which should define the format
+of the reply.</p>
+
+<h3>Mouse click and cursor sense formats </h3>
+<p>A format that describes the mouse click or cursor reply sequences, has the
+following possibilities (based on the cursor-addressing format of termcap(5)):
+<br>
+All characters in the string literally match the corresponding character in
+the reply, except a % followed by other characters, which have the following
+meaning: 
+<ul>
+<li>%% matches a %</li>
+<li>%. matches any character</li>
+<li>%d matches a number </li>
+<li>%2 matches a 2 digit number </li>
+<li>%3 matches a 3 digit number </li>
+<li>%+c (for some character c) matches a character, which is treated as
+a number, from which the value of c is subtracted. </li>
+<li>%-c Similarly, but c is added.</li>
+</ul>
+The following two do not match anything in the input, but affect the
+way numbers are interpreted: 
+<ul>
+<li>%i Causes the next number matched by %d,
+%2, and %3 (as well as %+ and %-) to be decremented by 1 (for terminals that
+number rows and columns from 1 rather than 0). </li>
+<li>%r Numbers matched in the
+input are assigned alternately to the y coordinate, and then to the x
+coordinate, and so on, starting with the y coordinate. If %r occurs in the
+format, one step in this sequence is skipped (so, if the next number would
+have been assigned to x, after a %r it will be assigned to y).</li>
+</ul>
+<h3>Key Definition Format</h3>
+A key definition should be on one line in the key definitions file as follows:
+<pre>
+   [operation-name] = "definition-string" = "representation-string"
+</pre>
+The operation-name can be any regular
+operation, or one of [mouse-sense], [mouse-format], [cursor-sense] and
+[cursor-format]. The definition string can use '\e' or '\E' for the ESC
+character, or the normal escape sequence in C strings for control characters
+(like '\015' for the RETURN or CR character). The representation string must
+be a string of printable characters for use in the help summary. 
+
+<h3>Example</h3>
+<p>
+An xterm window sends a mouse click as 'ESC [ M c x y' where c is a
+single character <space>, ! or ", depending on which button is pressed, and x
+and y are single graphic characters starting at '!'. So, [mouse] can be bound
+to 'ESC [ M' and the format would be '%.%r%+!%+!', e.g.: 
+
+<pre>
+   [mouse] = "\e[M" = "mouse-click"
+   [mouse-format] = "%.%r%+!%+!" = ""
+</pre>
+The representation string for the mouse-format can remain empty since it won't be
+displayed in the help summary. <br>
+Another possibility is to bind [mouse] to <tt>"\e[M "</tt>,
+<tt>"\e[M!"</tt>, and <tt>"\e[M\""</tt>, and set the format to
+<tt>"%r%+!%+!"</tt>. <br>
+(To get xterm to send mouse clicks, you have to initially send the string
+'ESC [ ? 9 h' which you should put in your [term-init] binding as
+<tt>"\e[?9h"</tt>.) 
+
+<p>A uw window sends a mouse click as a mouse-down sequence and a mouse-up
+sequence, of the style 'ESC m y x 0 ESC m y x @', where x and y are
+single characters of the same style as xterm. So you can bind [mouse] to
+<tt>"\em"</tt>, and the format to \&<tt>"%+!%+!0\em%+!%+!@"</tt>, or
+<tt>"%+!%+!%."</tt> (in the second case, [mouse] gets called twice in quick
+succession).</p>
+
+<p>On a Hewlett Packard 2640b, the terminal can be asked for the current
+cursor position with the string 'ESC \(ga DC1'; it returns the position in
+the format 'ESC & a x c y Y CR', where x and y are numbers. Therefore
+you should add to your key definitions file:
+<pre>
+   [cursor-sense] = "\e`\021" = "" [cursor-format] = "\e&a%r%dc%dY\015" = ""
+</pre>
+
+<h2>Files</h2>
+<dl>
+<dt>$HOME/copybuf.abc</dt><dd>copy buffer between sessions</dd>
+
+<dt>$HOME/abc/wsgroup.abc</dt><dd> table mapping workspace names to directory names</dd>
+
+<dt>$HOME/abc/abc$TERM.key</dt><dd> private key definitions file (Unix only)</dd>
+
+<dt>$HOME/abc/abc.key</dt><dd> private key definitions file (non-Unix)</dd>
+
+<dt>position.abc</dt><dd> focus position of edited how-to's in workspace</dd>
+
+<dt>perm.abc</dt><dd> table mapping object names to file names</dd>
+
+<dt>suggest.abc</dt><dd> suggestion list for user-defined commands</dd>
+
+<dt>types.abc</dt><dd> table with codes for type-checking between how-to's</dd>
+
+<dt>*.cmd</dt><dd> command how-to's in this workspace</dd>
+
+<dt>*.zfd,</dt><dd> *.mfd, *.dfd function how-to's in this workspace</dd>
+
+<dt>*.zpd,</dt><dd> *.mpd, *.dpd predicate how-to's in this workspace</dd>
+
+<dt>*.cts</dt><dd> permanent locations in this workspace</dd>
+
+<dt>abc.msg</dt><dd> messages file, used for errors (not on Macintosh)</dd>
+
+<dt>abc.hlp</dt><dd> helpfile with this text (MacABC.help on Macintosh)</dd>
+</dl>
+<p>The latter two are searched for first in your startup directory, then in
+$HOME/abc, and finally, on Unix, in a directory determined by the installer of
+ABC. On a PC, $HOME = My Documents.</p>
+
+<h2>PC Implementation</h2>
+There are four files for running ABC, the program <tt>abc.exe</tt> itself,
+<tt>abckeys.exe</tt> for changing your key bindings, the help file
+<tt>abc.hlp</tt>, and the error messages file <tt>abc.msg</tt>. (See FILES
+above.)
+</p><p>
+If you want to use a window size other than the default 25 x 80, you can specify the screen-size by typing after the
+<tt>C&gt;</tt> prompt, before you start ABC up, the following:
+
+<tt>SET SCREEN=BIOS</tt> <em>lines cols</em>
+</p>
+<h2>See Also</h2>
+<ul>
+<li>Leo Geurts, Lambert Meertens and Steven Pemberton, <em>"The
+ABC Programmer's Handbook"</em>, Prentice-Hall, Englewood Cliffs, New Jersey, 1990,
+ISBN 0-13-000027-2.</li>
+<li>Steven Pemberton, <em>"An Alternative Simple
+Language and Environment for PCs"</em>, IEEE Software, Vol. 4, No. 1, January 1987,
+pp. 56-64.</li>
+<li><a href="http://www.cwi.nl/~steven/abc/">http://www.cwi.nl/~steven/abc/</a>
+</li>
+<li><em>
+"The ABC Newsletter"</em>. Available free from the web site above.</li>
+<li><em><a href="ABC-qr.html">The ABC Quick Reference</a></em></li>
+</ul>
+<h2>Authors</h2>
+Eddy Boeve, Frank van Dijk, Leo Geurts, Timo Krijnen, Lambert Meertens, Steven
+Pemberton, Guido van Rossum.
+
+<h2>Address</h2>
+ABC Distribution, CWI/AA, Postbox 4079, 1009 AB Amsterdam, The Netherlands.
+<br>
+E-mail: <a href="mailto:abc@cwi.nl">abc@cwi.nl</a>
+
+<h2>Summary of Special Actions</h2>
+<dl compact>
+<dt><tt>:</tt><em>name</em></dt><dd> Visit how-to called 'name' </dd>
+
+<dt><tt>:</tt></dt><dd> Visit last how-to referred to</dd>
+
+<dt><tt>::</tt></dt><dd> Display headings of how-to's in this workspace </dd>
+
+<dt><tt>=</tt><em>name</em></dt><dd> Visit contents of location 'name'</dd>
+
+<dt><tt>=</tt></dt><dd> Visit last location visited </dd>
+
+<dt><tt>==</tt></dt><dd> Display names of permanent locations in this workspace</dd>
+
+<dt><tt>&gt;</tt><em>name</em></dt><dd> Visit workspace 'name' </dd>
+
+<dt><tt>&gt;</tt></dt><dd> Visit last workspace visited </dd>
+
+<dt><tt>&gt;&gt;</tt></dt><dd> Display list of workspace names</dd>
+
+<dt><tt>QUIT</tt></dt><dd> Leave ABC</dd>
+</dl>
+<h2>Summary of Editing Operations</h2>
+<table>
+<tr>
+<th>Name</th>
+<th>Default Keys</th>
+<th>Short description</th>
+</tr>
+
+<tr>
+<td>Accept</td>
+<td><tt>[TAB]</tt></td>
+<td>Accept suggestion, focus to hole or end of line</td>
+</tr>
+
+<tr>
+<td>Return</td>
+<td><tt>[RETURN]</tt></td>
+<td>Add line or decrease indentation</td>
+</tr>
+
+<tr>
+<td>Widen</td>
+<td><em>f1</em>, <tt>[ESC]</tt> w </td>
+<td>Widen focus </td>
+</tr>
+
+<tr>
+<td>Extend </td>
+<td><em>f2</em>, <tt>[ESC]</tt> e</td>
+<td>Extend focus (usually to the right) </td>
+</tr>
+
+<tr>
+<td>First </td>
+<td><em>f3</em>, <tt>[ESC]</tt> f </td>
+<td>Move focus to first contained item </td>
+</tr>
+
+<tr>
+<td>Last </td>
+<td><em>f4</em>, <tt>[ESC]</tt> l </td>
+<td>Move focus to last contained item</td>
+</tr>
+
+<tr>
+<td>Previous </td>
+<td><em>f5</em>, <tt>[ESC]</tt> p </td>
+<td>Move focus to previous item </td>
+</tr>
+
+<tr>
+<td>Next</td>
+<td><em>f6</em>, <tt>[ESC]</tt> n </td>
+<td>Move focus to next item </td>
+</tr>
+
+<tr>
+<td>Upline </td>
+<td><em>f7</em>, <tt>[ESC]</tt> u </td>
+<td>Move focus to whole line above </td>
+</tr>
+
+<tr>
+<td>Downline </td>
+<td><em>f8</em>, <tt>[ESC]</tt> d </td>
+<td>Move focus to whole line below</p></td>
+</tr>
+
+<tr>
+<td>Up </td>
+<td>[up arrow], <tt>[ESC]</tt> U </td>
+<td>Make new hole, move up </td>
+</tr>
+
+<tr>
+<td>Down </td>
+<td>[down arrow], <tt>[ESC]</tt> D </td>
+<td>Make new hole, move down </td>
+</tr>
+
+<tr>
+<td>Left</td>
+<td>[left arrow], <tt>[ESC]</tt> , </td>
+<td>Make new hole, move left </td>
+</tr>
+
+<tr>
+<td>Right </td>
+<td>[right arrow], <tt>[ESC]</tt> . </td>
+<td>Make new hole, move right</td>
+</tr>
+
+<tr>
+<td>Goto </td>
+<td><tt>[ctrl-G]</tt></td>
+<td>New focus at cursor position </td>
+</tr>
+
+<tr>
+<td>Mouse </td>
+<td><em>mouse-click</em></td>
+<td>New focus at position of mouse-click</td>
+</tr>
+
+<tr>
+<td>Undo </td>
+<td><tt>[BACKSPACE]</tt> </td>
+<td>Undo effect of last key pressed (may be repeated) </td>
+</tr>
+
+<tr>
+<td>Redo</td>
+<td><tt>[ctrl-U]</tt> </td>
+<td>Redo last UNDOne key (may be repeated)</td>
+</tr>
+
+<tr>
+<td>Copy </td>
+<td><em>f9</em>, <tt>[ctrl-C]</tt>, <tt>[ESC]</tt>c</td>
+<td>Copy buffer to hole, or focus to buffer </td>
+</tr>
+
+<tr>
+<td>Delete </td>
+<td><tt>[ctrl-D]</tt> </td>
+<td>Delete contents of focus (to buffer if empty)</td>
+</tr>
+
+<tr>
+<td>Record </td>
+<td><tt>[ctrl-R]</tt> </td>
+<td>Start/stop recording keystrokes </td>
+</tr>
+
+<tr>
+<td>Play </td>
+<td><tt>[ctrl-P]</tt> </td>
+<td>Play back recorded keystrokes</td>
+</tr>
+
+<tr>
+<td>Look </td>
+<td><tt>[ctrl-L]</tt> </td>
+<td>Redisplay screen </td>
+</tr>
+
+<tr>
+<td>Help </td>
+<td><em>f10</em>, <tt>[ESC]</tt>? </td>
+<td>Print summary of editing operations</td>
+</tr>
+
+<tr>
+<td>Exit </td>
+<td><tt>[ctrl-X]</tt> </td>
+<td>Finish changes or execute command </td>
+</tr>
+
+<tr>
+<td>Interrupt </td>
+<td>(as set by 'stty') </td>
+<td>Interrupt command execution </td>
+</tr>
+
+<tr>
+<td>Suspend </td>
+<td>(as set by 'stty') </td>
+<td>Suspend ABC (only for shell with job control)</td>
+</tr>
+</table>
+<p>Notes:</p>
+
+<p><tt>[Ctrl-D]</tt> means: hold the <tt>[CTRL]</tt> (or <tt>[CONTROL]</tt>) key down while
+pressing D. <br>
+<tt>[ESC]</tt> w means: press the <tt>[ESC]</tt> key first, then w. </p>
+
+</body>
+</html>
