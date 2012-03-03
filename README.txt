@@ -19,6 +19,20 @@ or via CiteSeerX [4].
 [3] http://oai.cwi.nl/oai
 [4] http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.100.3565
 
+The file abc-windows.zip was downloaded from [5] and unzipped, creating the
+ABC directory here.
+
+[5] http://homepages.cwi.nl/~steven/abc/implementations/abc-windows.zip
+
+The workspaces/ directory was created by hand, but the workspaces/abc/
+directory and its contents were created by the ABC environment as the
+system was used, after the HOME variable in ABC/abc.bat was changed to
+point to workspaces.
+
+The directory workspaces/abc/first contains the >first default workspace.
+Read the FILES section in ABC/abc.hlp for a description of the files that
+hold workspaces.
+
 ##############################################################
 ABC Programmer's Handbook
 
