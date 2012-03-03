@@ -1,5 +1,6 @@
-set HOME=%homedrive%%homepath%\
-set TERMINFO=%homedrive%\Program Files\ABC\
+cls
+set HOME=E:\workspaces\
+set TERMINFO=E:\ABC\
 set TERM=cygwin
 set SCREEN=bios 50 80
 abcexe.exe
