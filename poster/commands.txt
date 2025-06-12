@@ -1,0 +1,62 @@
+Flow control
+============
+
+CHECK «test»
+    Check test and stop if it fails
+
+FOR «name»,... IN «train»: 
+    «statements
+    Take each element of train in turn
+
+IF «test»: 
+    «statements»
+    If test	succeeds, execute statements; no ELSE allowed
+PASS
+    Do nothing
+
+SELECT: 
+    «test»: «statements»
+    ...	
+    «test»: «statements»	
+    Select one alternative: try each test in order (one must succeed; the last test may be ELSE)
+
+WHILE «test»: 
+    «»
+    As long	as test	succeeds execute statements
+
+«name» «expr «name» ...
+    Execute	user-defined command «name»
+«name»
+    Execute	refined	command «name»
+
+
+Input/output
+============
+
+WRITE «expr»
+    Write to screen; / before or after expr gives new line
+READ «address» EG «expr»
+    Read expression	from terminal to address; expr is example
+READ «address» RAW
+    Read line of text
+    
+Locations    
+=========
+
+PUT «expr» IN «address»
+    Put value of expr in address
+REMOVE «expr» FROM «list»
+    Remove one element from	list
+INSERT «expr IN «list»
+    Insert in right	place
+DELETE «address»s
+    Delete permanent location or table entry
+
+Etc.
+====
+
+SET RANDOM «expr»
+    Start random sequence for random and choice
+
+
+

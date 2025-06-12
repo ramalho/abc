@@ -1,0 +1,26 @@
+
+address
+
+command
+    user-defined
+
+exact / inexact
+
+function
+
+how-to
+
+location
+    permanent location
+
+
+predicate
+
+refinement
+
+test
+
+train
+
+
+
