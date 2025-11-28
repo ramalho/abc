@@ -1,0 +1,17 @@
+body {margin-left: 2cm; background-color: white; font-family: sans-serif; max-width: 50em;}
+
+h1, h2, h3, h4, h5, h6
+	{font-family: futura, helvetica, sans-serif;
+	 margin-left: -2cm; background-color: yellow;
+	 padding-left: 1em; border: thin black solid
+}
+
+hr {margin-left: -2em}
+
+pre { margin-left: 2em} 
+
+a:hover {background-color: yellow; color: black; outline: thin black solid}
+
+.new {background-color: yellow}
+
+.callout {border: medium black dotted}

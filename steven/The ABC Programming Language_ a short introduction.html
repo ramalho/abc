@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0037)https://homepages.cwi.nl/~steven/abc/ -->
+<html xmlns="http://www.w3.org/1999/xhtml" data-lt-installed="true"><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+  
+  <title>The ABC Programming Language: a short introduction</title>
+  <link href="./The ABC Programming Language_ a short introduction_files/abc.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<h1>The ABC Programming Language: a short introduction</h1>
+
+<p>(<a href="http://www2.airnet.ne.jp/sardine/complang/ABCintro.html">Also
+available in Japanese</a>)</p>
+
+<p class="callout">New: <a href="https://inference-review.com/article/the-origins-of-python">The Origins
+of Python</a> - An article by Lambert Meertens on the origins of ABC, and its
+influence on Python.</p>
+
+<p class="callout">New: <a href="https://homepages.cwi.nl/~steven/abc/implementations.html">Implementation</a> for
+the Raspberry Pi!.</p>
+
+<p class="callout"><a href="https://homepages.cwi.nl/~steven/abc/programmers/handbook.html">The ABC Programmer's
+Handbook</a> is available online.</p>
+
+<p>ABC is an interactive programming language and environment for personal
+computing, originally intended as a good replacement for BASIC. It was designed
+by first doing a <em>task analysis</em> of the programming task.</p>
+
+<p>ABC is easy to learn (an hour or so for someone who has already programmed),
+and yet easy to use. Originally intended as a language for beginners, it has
+evolved into a powerful tool for beginners and experts alike.</p>
+
+<p>Here is an example function <em>words</em> to collect the set of all words
+in a document:</p>
+<pre>   HOW TO RETURN words document:
+      PUT {} IN collection
+      FOR line IN document:
+         FOR word IN split line:
+            IF word not.in collection:
+               INSERT word IN collection
+      RETURN collection</pre>
+
+<p>Some features of the language:</p>
+<ul>
+  <li>a powerful collection of only 5 data types that can easily be combined
+  </li>
+  <li>strong typing, yet without declarations </li>
+  <li>no limitations (such as max int), apart from sheer exhaustion of memory
+  </li>
+  <li>refinements to support top-down programming </li>
+  <li>nesting by indentation </li>
+  <li>programs typically one fourth or one fifth the size of the equivalent
+    Pascal or C. </li>
+</ul>
+
+<p>Some features of the environment:</p>
+<ul>
+  <li>no need for files: procedures and functions and global variables remain
+    after logging out </li>
+  <li>one consistent face is shown to the user at all times, whether executing
+    commands, editing, or entering input to a program </li>
+  <li>generalized undo mechanism. </li>
+</ul>
+
+<p>Here follows a quick overview of the programming language ABC and its
+implementations, and a few examples of ABC programs. Full documentation about
+ABC is in the ABC Programmer's Handbook (details below).</p>
+<ul>
+  <li><a href="https://homepages.cwi.nl/~steven/abc/language.html">The Language</a></li>
+  <li><a href="https://homepages.cwi.nl/~steven/abc/environment.html">The Environment</a></li>
+  <li><a href="https://homepages.cwi.nl/~steven/abc/types.html">Some Simple Examples</a></li>
+  <li><a href="https://homepages.cwi.nl/~steven/abc/examples/">Program Examples</a></li>
+  <li><a href="https://homepages.cwi.nl/~steven/abc/teaching.html">Why ABC is good for teaching purposes</a></li>
+  <li><a href="https://homepages.cwi.nl/~steven/abc/publications.html#NL">Newsletters</a></li>
+  <li><a href="https://homepages.cwi.nl/~steven/abc/publications.html">A list of all publications about ABC.</a></li>
+  <li><a href="https://homepages.cwi.nl/~steven/abc/qr.html">ABC Quick Reference.</a></li>
+  <li><a href="https://homepages.cwi.nl/~steven/abc/implementations.html">Implementations</a>: for the PC, Unix, the
+    Mac, and the Raspberry Pi.</li>
+</ul>
+
+<h2>MORE INFORMATION</h2>
+
+<p>Full details of ABC and the implementations, along with many example
+programs are in the book <a href="https://homepages.cwi.nl/~steven/abc/programmers/handbook.html"><cite>"The ABC
+Programmer's Handbook"</cite></a> by Leo Geurts, Lambert Meertens and Steven
+Pemberton, originally published by Prentice-Hall (ISBN 0-13-000027-2), and
+later reissued by Bosko Books (ISBN 0-9547239-4-5).</p>
+
+<p>See also Steven Pemberton, <cite>"An Alternative Simple Language and
+Environment for PCs"</cite>, IEEE Software, Vol. 4, No. 1, January 1987, pp.
+56-64.</p>
+
+<p>There are also copies of an irregular newsletter (see above). Back issues
+not online are no longer available.</p>
+
+<p>Email: <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;tf=1&amp;to=steven.pemberton@cwi.nl" target="_blank">steven.pemberton@cwi.nl</a></p>
+<hr>
+<address>
+  <a href="http://www.cwi.nl/~steven/">Steven Pemberton</a>, <a href="http://www.cwi.nl/">CWI</a>, <a href="http://www.cwi.nl/~steven/amsterdam.html">Amsterdam</a> 
+</address>
+<!-- Created: Thu Jan 11 10:38:12 CET 2001 -->
+<!-- hhmts start -->
+Last modified: <!--$date=-->2024-02-09<!--$--><!-- hhmts end -->
+
+</body></html>
